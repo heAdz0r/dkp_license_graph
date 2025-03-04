@@ -90,9 +90,9 @@ const DecisionTree: React.FC<DecisionTreeProps> = ({ onEditionSelect }) => {
     setPath(newPath);
     
     // Если текущий узел имеет результат, уведомляем родителя
-    const currentNode = decisionTree[currentNodeId];
-    if (currentNode.result) {
-      const edition = editions.find(e => e.id === currentNode.result) || null;
+    const selectedNode = decisionTree[currentNodeId];
+    if (selectedNode.result) {
+      const edition = editions.find(e => e.id === selectedNode.result) || null;
       onEditionSelect(edition);
     } else {
       onEditionSelect(null);
@@ -277,11 +277,11 @@ const DecisionTree: React.FC<DecisionTreeProps> = ({ onEditionSelect }) => {
   }, [createHierarchy, currentNodeId]);
 
   const handleAnswerClick = (answer: 'yes' | 'no') => {
-    const currentNode = decisionTree[currentNodeId];
-    if (answer === 'yes' && currentNode.yes) {
-      setCurrentNodeId(decisionTree[currentNode.yes].id);
-    } else if (answer === 'no' && currentNode.no) {
-      setCurrentNodeId(decisionTree[currentNode.no].id);
+    const activeNode = decisionTree[currentNodeId];
+    if (answer === 'yes' && activeNode.yes) {
+      setCurrentNodeId(decisionTree[activeNode.yes].id);
+    } else if (answer === 'no' && activeNode.no) {
+      setCurrentNodeId(decisionTree[activeNode.no].id);
     }
   };
 
