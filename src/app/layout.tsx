@@ -1,6 +1,7 @@
 import './globals.css'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
+import Link from 'next/link'
 
 const inter = Inter({ subsets: ['latin', 'cyrillic'] })
 
@@ -19,9 +20,19 @@ export default function RootLayout({
       <body className={`${inter.className} bg-gray-100 min-h-screen`}>
         <header className="bg-white shadow">
           <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
-            <h1 className="text-2xl font-bold text-gray-900">
-              Выбор лицензии Deckhouse Kubernetes Platform
-            </h1>
+            <div className="flex justify-between items-center">
+              <h1 className="text-2xl font-bold text-gray-900">
+                Выбор лицензии Deckhouse Kubernetes Platform
+              </h1>
+              <nav className="flex space-x-4">
+                <Link href="/" className="text-gray-600 hover:text-gray-900 font-medium">
+                  Главная
+                </Link>
+                <Link href="/compare" className="text-gray-600 hover:text-gray-900 font-medium">
+                  Сравнение редакций
+                </Link>
+              </nav>
+            </div>
           </div>
         </header>
         <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
