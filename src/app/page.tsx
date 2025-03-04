@@ -11,7 +11,13 @@ import { Edition, features } from "@/data/licenseData";
 const DecisionTree = dynamic(() => import("@/components/DecisionTree"), {
   ssr: false,
   loading: () => <div className="w-full h-96 bg-gray-100 rounded-lg flex items-center justify-center">
-    <div className="text-gray-500">Загрузка визуализации графа решений...</div>
+    <div className="flex flex-col items-center text-gray-500">
+      <svg className="w-10 h-10 text-gray-300 mb-3 animate-spin" viewBox="0 0 24 24" fill="none">
+        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+      <div>Загрузка визуализации графа решений...</div>
+    </div>
   </div>
 });
 
@@ -28,11 +34,6 @@ export default function Home() {
   // Функция для выбора редакции
   const handleEditionSelect = useCallback((edition: Edition | null) => {
     setSelectedEdition(edition);
-  }, []);
-  
-  // Функция для переключения режима просмотра
-  const toggleViewMode = useCallback(() => {
-    setViewMode(prev => prev === 'calculator' ? 'visualization' : 'calculator');
   }, []);
 
   return (
@@ -81,112 +82,199 @@ export default function Home() {
       {/* Основная секция с калькулятором/визуализацией и карточкой редакции */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Левая колонка (2/3 ширины на больших экранах) */}
-        <div className="lg:col-span-2">
+        <div className={`${viewMode === 'visualization' ? 'lg:col-span-3' : 'lg:col-span-2'}`}>
           {viewMode === 'calculator' ? (
             <StepCalculator onEditionSelect={handleEditionSelect} />
           ) : (
-            <div className="bg-white rounded-lg shadow-lg p-4 border border-gray-200">
-              <h2 className="text-xl font-bold mb-4">Граф принятия решений</h2>
-              <p className="text-gray-600 mb-4">
-                Визуализация процесса выбора редакции на основе ваших требований. Вы можете взаимодействовать с графом,
-                кликая на узлы для перехода между вопросами.
-              </p>
+            <div className="bg-white rounded-lg shadow-lg border border-gray-200">
+              <div className="p-5 border-b border-gray-200">
+                <h2 className="text-xl font-bold mb-2">Интерактивный граф принятия решений</h2>
+                <p className="text-gray-600">
+                  Визуализация процесса выбора редакции на основе ваших требований. Взаимодействуйте с графом,
+                  используя масштабирование, перемещение и клики по узлам для навигации по варианта выбора.
+                </p>
+              </div>
               <DecisionTree onEditionSelect={handleEditionSelect} />
             </div>
           )}
         </div>
         
         {/* Правая колонка (1/3 ширины на больших экранах) */}
-        <div>
-          {selectedEdition ? (
-            <div className="space-y-6">
-              <EditionCard edition={selectedEdition} features={features} />
-              
-              <div className="bg-white p-4 shadow-lg rounded-lg border border-gray-200">
-                <button
-                  onClick={() => setShowFullComparison(!showFullComparison)}
-                  className="w-full py-3 px-4 bg-gray-800 hover:bg-gray-900 text-white font-medium rounded-lg shadow transition duration-200 flex items-center justify-center"
-                >
-                  <svg 
-                    className="w-5 h-5 mr-2" 
-                    xmlns="http://www.w3.org/2000/svg" 
-                    fill="none" 
-                    viewBox="0 0 24 24" 
-                    stroke="currentColor"
+        {viewMode === 'calculator' && (
+          <div>
+            {selectedEdition ? (
+              <div className="space-y-6">
+                <EditionCard edition={selectedEdition} features={features} />
+                
+                <div className="bg-white p-4 shadow-lg rounded-lg border border-gray-200">
+                  <button
+                    onClick={() => setShowFullComparison(!showFullComparison)}
+                    className="w-full py-3 px-4 bg-gray-800 hover:bg-gray-900 text-white font-medium rounded-lg shadow transition duration-200 flex items-center justify-center"
                   >
-                    <path 
-                      strokeLinecap="round" 
-                      strokeLinejoin="round" 
-                      strokeWidth={2} 
-                      d={showFullComparison 
-                        ? "M5 15l7-7 7 7" 
-                        : "M19 9l-7 7-7-7"} 
-                    />
+                    <svg 
+                      className="w-5 h-5 mr-2" 
+                      xmlns="http://www.w3.org/2000/svg" 
+                      fill="none" 
+                      viewBox="0 0 24 24" 
+                      stroke="currentColor"
+                    >
+                      <path 
+                        strokeLinecap="round" 
+                        strokeLinejoin="round" 
+                        strokeWidth={2} 
+                        d={showFullComparison 
+                          ? "M5 15l7-7 7 7" 
+                          : "M19 9l-7 7-7-7"} 
+                      />
+                    </svg>
+                    {showFullComparison
+                      ? "Скрыть полное сравнение"
+                      : "Показать полное сравнение"}
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="bg-white p-6 shadow-lg rounded-lg border border-gray-200">
+                <div className="flex items-center mb-4 text-blue-600">
+                  <svg className="w-8 h-8 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                  {showFullComparison
-                    ? "Скрыть полное сравнение"
-                    : "Показать полное сравнение"}
-                </button>
+                  <h2 className="text-xl font-bold">Как выбрать редакцию?</h2>
+                </div>
+                
+                <p className="mb-4 text-gray-700">
+                  Используйте интерактивный калькулятор слева, чтобы получить рекомендацию по выбору оптимальной редакции
+                  Deckhouse Kubernetes Platform на основе ваших требований.
+                </p>
+                
+                <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mb-4">
+                  <h3 className="text-lg font-semibold text-blue-800 mb-2">Основные критерии выбора:</h3>
+                  <ul className="space-y-2 text-blue-700">
+                    <li className="flex items-center">
+                      <svg className="w-4 h-4 mr-2 text-blue-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                      Требования к сертификации ФСТЭК
+                    </li>
+                    <li className="flex items-center">
+                      <svg className="w-4 h-4 mr-2 text-blue-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                      Наличие в реестре российского ПО
+                    </li>
+                    <li className="flex items-center">
+                      <svg className="w-4 h-4 mr-2 text-blue-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                      Возможность работы в закрытом контуре
+                    </li>
+                    <li className="flex items-center">
+                      <svg className="w-4 h-4 mr-2 text-blue-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                      Необходимость интерфейса администратора
+                    </li>
+                    <li className="flex items-center">
+                      <svg className="w-4 h-4 mr-2 text-blue-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                      Расширенные функции безопасности
+                    </li>
+                  </ul>
+                </div>
+                
+                <p className="text-gray-700">
+                  После получения рекомендации вы увидите подробную информацию о выбранной редакции и сможете сравнить её с другими
+                  вариантами для принятия оптимального решения.
+                </p>
               </div>
-            </div>
-          ) : (
-            <div className="bg-white p-6 shadow-lg rounded-lg border border-gray-200">
-              <div className="flex items-center mb-4 text-blue-600">
-                <svg className="w-8 h-8 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <h2 className="text-xl font-bold">Как выбрать редакцию?</h2>
-              </div>
-              
-              <p className="mb-4 text-gray-700">
-                Используйте интерактивный калькулятор слева, чтобы получить рекомендацию по выбору оптимальной редакции
-                Deckhouse Kubernetes Platform на основе ваших требований.
-              </p>
-              
-              <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mb-4">
-                <h3 className="text-lg font-semibold text-blue-800 mb-2">Основные критерии выбора:</h3>
-                <ul className="space-y-2 text-blue-700">
-                  <li className="flex items-center">
-                    <svg className="w-4 h-4 mr-2 text-blue-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                    Требования к сертификации ФСТЭК
-                  </li>
-                  <li className="flex items-center">
-                    <svg className="w-4 h-4 mr-2 text-blue-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                    Наличие в реестре российского ПО
-                  </li>
-                  <li className="flex items-center">
-                    <svg className="w-4 h-4 mr-2 text-blue-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                    Возможность работы в закрытом контуре
-                  </li>
-                  <li className="flex items-center">
-                    <svg className="w-4 h-4 mr-2 text-blue-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                    Необходимость интерфейса администратора
-                  </li>
-                  <li className="flex items-center">
-                    <svg className="w-4 h-4 mr-2 text-blue-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                    Расширенные функции безопасности
-                  </li>
-                </ul>
-              </div>
-              
-              <p className="text-gray-700">
-                После получения рекомендации вы увидите подробную информацию о выбранной редакции и сможете сравнить её с другими
-                вариантами для принятия оптимального решения.
-              </p>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
+        )}
       </div>
+      
+      {/* Результаты выбора в режиме визуализации */}
+      {viewMode === 'visualization' && selectedEdition && (
+        <div className="bg-white rounded-lg shadow-lg p-6 border border-gray-200 mt-6">
+          <div className="flex flex-col lg:flex-row gap-8 items-start">
+            <div className="lg:w-2/3">
+              <h2 className="text-2xl font-bold text-gray-800 mb-4">Выбранная редакция</h2>
+              <div className="bg-indigo-50 p-5 rounded-lg border border-indigo-100">
+                <div className="flex items-center mb-3">
+                  <div className="w-12 h-12 bg-indigo-600 rounded-full flex items-center justify-center text-white">
+                    <svg className="w-6 h-6" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <div className="ml-4">
+                    <h3 className="text-xl font-bold text-gray-900">{selectedEdition.name}</h3>
+                    <p className="text-indigo-700">{selectedEdition.description}</p>
+                  </div>
+                </div>
+                
+                <div className="mt-4">
+                  <button
+                    onClick={() => setShowFullComparison(!showFullComparison)}
+                    className="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg shadow transition duration-200 flex items-center justify-center"
+                  >
+                    <svg 
+                      className="w-5 h-5 mr-2" 
+                      xmlns="http://www.w3.org/2000/svg" 
+                      fill="none" 
+                      viewBox="0 0 24 24" 
+                      stroke="currentColor"
+                    >
+                      <path 
+                        strokeLinecap="round" 
+                        strokeLinejoin="round" 
+                        strokeWidth={2} 
+                        d={showFullComparison 
+                          ? "M5 15l7-7 7 7" 
+                          : "M19 9l-7 7-7-7"} 
+                      />
+                    </svg>
+                    {showFullComparison
+                      ? "Скрыть полное сравнение"
+                      : "Показать полное сравнение"}
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div className="lg:w-1/3">
+              <h3 className="text-lg font-semibold text-gray-800 mb-3">Ключевые характеристики</h3>
+              <ul className="space-y-2">
+                {features
+                  .filter(feature => feature.importance >= 8 && selectedEdition.features[feature.id] === 'present')
+                  .map(feature => (
+                    <li key={feature.id} className="flex items-start p-2 border border-green-100 rounded-md bg-green-50">
+                      <svg className="w-5 h-5 text-green-600 mt-0.5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                      <div>
+                        <div className="font-medium text-gray-900">{feature.name}</div>
+                        <div className="text-xs text-gray-600">{feature.description}</div>
+                      </div>
+                    </li>
+                  ))}
+                  
+                {features
+                  .filter(feature => feature.importance >= 8 && selectedEdition.features[feature.id] === 'absent')
+                  .map(feature => (
+                    <li key={feature.id} className="flex items-start p-2 border border-red-100 rounded-md bg-red-50">
+                      <svg className="w-5 h-5 text-red-600 mt-0.5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                      </svg>
+                      <div>
+                        <div className="font-medium text-gray-900">{feature.name}</div>
+                        <div className="text-xs text-gray-600">{feature.description}</div>
+                      </div>
+                    </li>
+                  ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      )}
       
       {/* Секция полного сравнения (отображается, если включено) */}
       {showFullComparison && (
