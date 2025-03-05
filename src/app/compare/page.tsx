@@ -21,10 +21,6 @@ import {
   Typography,
   Alert
 } from '@mui/material';
-import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
-import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
-import SelectAllIcon from '@mui/icons-material/SelectAll';
-import ClearAllIcon from '@mui/icons-material/ClearAll';
 
 export default function ComparePage() {
   // Состояние для выбранных редакций
@@ -88,15 +84,13 @@ export default function ComparePage() {
             
             <Stack direction="row" spacing={1}>
               <Button 
-                startIcon={<SelectAllIcon />}
                 size="small"
                 onClick={handleSelectAll}
                 variant="outlined"
               >
-                Все
+                Выбрать все
               </Button>
               <Button 
-                startIcon={<ClearAllIcon />}
                 size="small"
                 onClick={handleClearAll}
                 variant="outlined"
@@ -166,7 +160,6 @@ export default function ComparePage() {
             <Button
               component={Link}
               href="/"
-              startIcon={<KeyboardBackspaceIcon />}
               variant="contained"
             >
               Вернуться к выбору
@@ -189,7 +182,6 @@ export default function ComparePage() {
         <ComparisonTable selectedEditions={editionsToShow} />
       ) : (
         <Paper sx={{ p: 6, textAlign: 'center' }}>
-          <CompareArrowsIcon sx={{ fontSize: 60, color: 'text.disabled', mb: 2 }} />
           <Typography variant="h6" gutterBottom>
             Не выбрано ни одной редакции
           </Typography>
