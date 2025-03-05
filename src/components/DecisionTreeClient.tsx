@@ -6,6 +6,14 @@ import {
   Edition,
   editions,
 } from "@/data/licenseData";
+import { 
+  Box, 
+  Button, 
+  ButtonGroup, 
+  Paper, 
+  Typography,
+  Chip
+} from '@mui/material';
 
 interface TreeNodeData extends d3.HierarchyNode<DecisionNode> {
   x0?: number;
@@ -731,260 +739,273 @@ const DecisionTreeClient: React.FC<DecisionTreeProps> = ({
   // Показываем индикатор загрузки, пока не готовы данные
   if (loading || !isClient) {
     return (
-      <div className="flex flex-col space-y-4">
-        <div className="bg-white shadow rounded-lg p-4 animate-pulse">
-          <div className="h-7 bg-gray-200 rounded mb-3 w-3/4"></div>
-          <div className="h-5 bg-gray-200 rounded mb-4 w-full"></div>
-          
-          <div className="flex space-x-3 mb-4">
-            <div className="h-9 bg-green-200 rounded w-24"></div>
-            <div className="h-9 bg-red-200 rounded w-24"></div>
-          </div>
-        </div>
-        
-        <div className="bg-white shadow rounded-lg p-3 animate-pulse">
-          <div className="flex justify-between">
-            <div className="h-8 bg-gray-200 rounded w-32"></div>
-            <div className="h-8 bg-gray-200 rounded w-32"></div>
-          </div>
-        </div>
-        
-        <div className="relative bg-white shadow-lg rounded-lg border border-gray-200 overflow-hidden animate-pulse" style={{ height: '500px' }}>
-          <div className="flex items-center justify-center h-full">
-            <div className="flex flex-col items-center">
-              <svg className="w-12 h-12 text-indigo-500 mb-3 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              <div className="text-indigo-700 font-medium">
-                Визуализация дерева решений...
-              </div>
-              <div className="text-gray-500 text-sm mt-2">
-                Подготовка интерактивной диаграммы
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <Box 
+        sx={{ 
+          p: 4, 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'center',
+          height: 550,
+          bgcolor: 'background.paper',
+          borderRadius: 1,
+          border: '1px solid',
+          borderColor: 'divider'
+        }}
+      >
+        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <Typography 
+            variant="body1" 
+            color="text.secondary" 
+            fontWeight="medium" 
+            sx={{ mb: 1 }}
+          >
+            Загрузка визуализации...
+          </Typography>
+          <Typography 
+            variant="caption" 
+            color="text.secondary"
+          >
+            Подготовка интерактивной диаграммы
+          </Typography>
+        </Box>
+      </Box>
     );
   }
 
   return (
-    <div className="flex flex-col space-y-4">
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
       {/* Панель навигации */}
-      <div className="bg-white shadow rounded-lg p-4 border border-gray-100">
-        <h3 className="text-xl font-bold mb-3 text-gray-800">
+      <Paper
+        variant="outlined"
+        sx={{ p: 2, bgcolor: 'background.paper' }}
+      >
+        <Typography variant="h6" gutterBottom component="h3">
           Проводник по выбору редакции DKP
-        </h3>
-        <div className="mb-5 bg-gray-50 p-4 rounded-lg border border-gray-200">
-          <p className="text-gray-700">{currentNode?.question || ""}</p>
-        </div>
+        </Typography>
+        
+        <Box
+          sx={{
+            mb: 2,
+            p: 2,
+            bgcolor: 'background.default',
+            borderRadius: 1,
+            border: '1px solid',
+            borderColor: 'divider'
+          }}
+        >
+          <Typography>{currentNode?.question || ""}</Typography>
+        </Box>
 
         {!isEndNode ? (
-          <div className="flex flex-wrap gap-3">
-            <button
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            <Button
+              variant="contained"
+              color="success"
               onClick={() => handleAnswerClick("yes")}
-              className="px-4 py-2.5 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 transition-colors shadow-sm flex items-center"
               disabled={!currentNode.yes}
             >
-              <svg className="w-5 h-5 mr-1.5" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-              </svg>
               Да
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="contained"
+              color="error"
               onClick={() => handleAnswerClick("no")}
-              className="px-4 py-2.5 bg-rose-600 text-white rounded-md hover:bg-rose-700 transition-colors shadow-sm flex items-center"
               disabled={!currentNode.no}
             >
-              <svg className="w-5 h-5 mr-1.5" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-              </svg>
               Нет
-            </button>
-          </div>
+            </Button>
+          </Box>
         ) : (
-          <button
+          <Button
+            variant="contained"
+            color="primary"
             onClick={handleReset}
-            className="px-4 py-2.5 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors shadow-sm flex items-center"
           >
-            <svg className="w-5 h-5 mr-1.5" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd" />
-            </svg>
             Начать заново
-          </button>
+          </Button>
         )}
-      </div>
+      </Paper>
 
-      {/* Панель инструментов с прогрессом */}
-      <div className="bg-white shadow rounded-lg divide-y divide-gray-100 border border-gray-100">
-        {/* Строка прогресса */}
-        <div className="px-5 py-3">
-          <div className="flex justify-between items-center text-sm text-gray-600 mb-1.5">
-            <span className="font-medium">Прогресс по дереву решений</span>
-            <span className="bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded font-medium">
-              {isEndNode ? "Завершено" : `${Math.min(Math.round((path.length / 6) * 100), 99)}%`}
-            </span>
-          </div>
-          <div className="w-full bg-gray-100 rounded-full h-2.5 overflow-hidden">
-            <div
-              className="h-full bg-indigo-600 rounded-full transition-all duration-500"
-              style={{ width: isEndNode ? "100%" : `${Math.min(Math.round((path.length / 6) * 100), 99)}%` }}
+      {/* Прогресс и панель инструментов */}
+      <Paper
+        variant="outlined"
+        sx={{ 
+          p: 0, 
+          bgcolor: 'background.paper',
+          overflow: 'hidden' 
+        }}
+      >
+        {/* Индикатор прогресса */}
+        <Box sx={{ p: 2, borderBottom: '1px solid', borderColor: 'divider' }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+            <Typography variant="body2" color="text.secondary">
+              Прогресс по дереву решений
+            </Typography>
+            <Chip 
+              size="small" 
+              color="primary" 
+              label={isEndNode ? "Завершено" : `${Math.min(Math.round((path.length / 6) * 100), 99)}%`}
             />
-          </div>
-        </div>
+          </Box>
+          <Box
+            sx={{
+              height: 5,
+              width: '100%',
+              bgcolor: 'grey.100',
+              borderRadius: 5,
+              overflow: 'hidden'
+            }}
+          >
+            <Box
+              sx={{
+                height: '100%',
+                width: isEndNode ? '100%' : `${Math.min(Math.round((path.length / 6) * 100), 99)}%`,
+                bgcolor: 'primary.main',
+                borderRadius: 5,
+                transition: 'width 0.5s ease'
+              }}
+            />
+          </Box>
+        </Box>
 
-        {/* Панель управления визуализацией */}
-        <div className="p-3 flex flex-wrap items-center gap-2 justify-between">
-          <div className="flex items-center gap-2">
-            <button
-              onClick={toggleFullTree}
-              className={`px-3 py-1.5 rounded-md text-sm font-medium flex items-center ${
-                showFullTree 
-                  ? 'bg-indigo-100 text-indigo-700 border border-indigo-200' 
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-200'
-              }`}
-            >
-              <svg className="w-4 h-4 mr-1.5" viewBox="0 0 20 20" fill="currentColor">
-                {showFullTree ? (
-                  <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
-                ) : (
-                  <path d="M2 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1H3a1 1 0 01-1-1V4zM8 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1H9a1 1 0 01-1-1V4zM15 3a1 1 0 00-1 1v12a1 1 0 001 1h2a1 1 0 001-1V4a1 1 0 00-1-1h-2z" />
-                )}
-              </svg>
-              {showFullTree ? 'Фокус на выбранном' : 'Показать всё дерево'}
-            </button>
-          </div>
-          
-          <div className="flex items-center space-x-2">
-            <button
-              onClick={handleZoomOut}
-              className="p-1.5 rounded-md text-gray-700 hover:bg-gray-100 border border-gray-200"
-              aria-label="Уменьшить"
-            >
-              <svg className="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M5 10a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1z" clipRule="evenodd" />
-              </svg>
-            </button>
-            
-            <div className="text-sm font-medium text-gray-700 w-16 text-center">
+        {/* Элементы управления */}
+        <Box 
+          sx={{ 
+            p: 1.5, 
+            display: 'flex', 
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            bgcolor: 'background.default',
+            borderTop: '1px solid',
+            borderColor: 'divider'
+          }}
+        >
+          <Button
+            size="small"
+            variant={showFullTree ? "contained" : "outlined"}
+            color="primary"
+            onClick={toggleFullTree}
+          >
+            {showFullTree ? 'Фокус на выбранном' : 'Показать всё дерево'}
+          </Button>
+
+          <ButtonGroup size="small" variant="outlined">
+            <Button onClick={handleZoomOut}>−</Button>
+            <Button onClick={handleResetZoom}>
               {Math.round(zoomLevel * 100)}%
-            </div>
-            
-            <button
-              onClick={handleZoomIn}
-              className="p-1.5 rounded-md text-gray-700 hover:bg-gray-100 border border-gray-200"
-              aria-label="Увеличить"
-            >
-              <svg className="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd" />
-              </svg>
-            </button>
-            
-            <button
-              onClick={handleResetZoom}
-              className="p-1.5 rounded-md text-gray-700 hover:bg-gray-100 border border-gray-200"
-              aria-label="Сбросить масштаб"
-            >
-              <svg className="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd" />
-              </svg>
-            </button>
-          </div>
-        </div>
-      </div>
+            </Button>
+            <Button onClick={handleZoomIn}>+</Button>
+          </ButtonGroup>
+        </Box>
+      </Paper>
 
       {/* Контейнер для визуализации дерева */}
-      <div 
-        ref={containerRef} 
-        className="relative overflow-hidden bg-white shadow-lg rounded-lg border border-gray-200"
-        style={{ height: '550px', width: '100%' }}
+      <Box
+        ref={containerRef}
+        sx={{
+          height: 500,
+          bgcolor: 'background.paper',
+          borderRadius: 1,
+          border: '1px solid',
+          borderColor: 'divider',
+          overflow: 'hidden',
+          position: 'relative'
+        }}
       >
-        {/* Инструкция */}
-        <div className="absolute top-3 right-3 bg-white bg-opacity-90 rounded-lg p-2.5 text-xs text-gray-600 shadow-sm border border-gray-200 z-10">
-          <div className="flex items-center mb-1.5">
-            <svg className="w-4 h-4 mr-1.5 text-indigo-500" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-            </svg>
-            <span className="font-semibold text-gray-700">Управление графом:</span>
-          </div>
-          <ul className="space-y-1.5 pl-2">
-            <li className="flex items-center">
-              <svg className="w-3 h-3 mr-1 text-indigo-400" viewBox="0 0 20 20" fill="currentColor">
-                <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
-              </svg>
-              <span>Колесо мыши: масштабирование</span>
-            </li>
-            <li className="flex items-center">
-              <svg className="w-3 h-3 mr-1 text-indigo-400" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M7 2a2 2 0 00-2 2v12a2 2 0 002 2h6a2 2 0 002-2V4a2 2 0 00-2-2H7zm3 14a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
-              </svg>
-              <span>Перетаскивание: перемещение графа</span>
-            </li>
-            <li className="flex items-center">
-              <svg className="w-3 h-3 mr-1 text-indigo-400" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M6.672 1.911a1 1 0 10-1.932.518l.259.966a1 1 0 001.932-.518l-.26-.966zM2.429 4.74a1 1 0 10-.517 1.932l.966.259a1 1 0 00.517-1.932l-.966-.26zm8.814-.569a1 1 0 00-1.415-1.414l-.707.707a1 1 0 101.415 1.415l.707-.708zm-7.071 7.072l.707-.707A1 1 0 003.465 9.12l-.708.707a1 1 0 001.415 1.415zm3.2-5.171a1 1 0 00-1.3 1.3l4 10a1 1 0 001.823.075l1.38-2.759 3.018 3.02a1 1 0 001.414-1.415l-3.019-3.02 2.76-1.379a1 1 0 00-.076-1.822l-10-4z" clipRule="evenodd" />
-              </svg>
-              <span>Клик по узлу: выбор варианта</span>
-            </li>
-          </ul>
-        </div>
-        
-        <svg 
-          ref={svgRef} 
-          width="100%" 
-          height="100%" 
-          className="font-sans"
+        <svg
+          ref={svgRef}
+          width="100%"
+          height="100%"
+          style={{ fontFamily: 'inherit' }}
         />
         
         {/* Легенда */}
-        <div className="absolute bottom-3 left-3 bg-white bg-opacity-90 rounded-lg p-2.5 text-xs shadow-sm border border-gray-200 flex items-center gap-4 z-10">
-          <div className="flex items-center">
-            <div className="w-3 h-3 bg-gray-50 border border-gray-300 rounded mr-1.5"></div>
-            <span className="text-gray-700">Вопрос</span>
-          </div>
-          <div className="flex items-center">
-            <div className="w-3 h-3 bg-indigo-600 rounded mr-1.5"></div>
-            <span className="text-gray-700">Текущий</span>
-          </div>
-          <div className="flex items-center">
-            <div className="w-3 h-3 bg-emerald-600 rounded mr-1.5"></div>
-            <span className="text-gray-700">Результат</span>
-          </div>
-        </div>
-      </div>
+        <Box
+          sx={{
+            position: 'absolute',
+            bottom: 10,
+            left: 10,
+            p: 1,
+            bgcolor: 'rgba(255, 255, 255, 0.85)',
+            borderRadius: 1,
+            border: '1px solid',
+            borderColor: 'divider',
+            display: 'flex',
+            gap: 1.5
+          }}
+        >
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <Box 
+              sx={{ 
+                width: 12, 
+                height: 12, 
+                bgcolor: 'background.paper', 
+                borderRadius: 0.5,
+                border: '1px solid',
+                borderColor: 'divider',
+                mr: 0.5
+              }} 
+            />
+            <Typography variant="caption">Вопрос</Typography>
+          </Box>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <Box 
+              sx={{ 
+                width: 12, 
+                height: 12, 
+                bgcolor: 'primary.main', 
+                borderRadius: 0.5, 
+                mr: 0.5 
+              }} 
+            />
+            <Typography variant="caption">Текущий</Typography>
+          </Box>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <Box 
+              sx={{ 
+                width: 12, 
+                height: 12, 
+                bgcolor: 'success.main', 
+                borderRadius: 0.5, 
+                mr: 0.5 
+              }} 
+            />
+            <Typography variant="caption">Результат</Typography>
+          </Box>
+        </Box>
+      </Box>
 
-      {/* Путь навигации */}
+      {/* Навигационные хлебные крошки */}
       {path.length > 1 && (
-        <div className="bg-gray-50 rounded-lg p-3 overflow-x-auto border border-gray-200">
-          <div className="flex items-center space-x-2 text-sm">
+        <Paper
+          variant="outlined"
+          sx={{
+            p: 1.5,
+            bgcolor: 'background.default'
+          }}
+        >
+          <Box sx={{ display: 'flex', overflowX: 'auto', gap: 1 }}>
             {path.map((node, index) => (
               <React.Fragment key={node.id}>
-                <span 
+                <Chip
+                  label={node.question.length > 20 ? node.question.substring(0, 20) + '...' : node.question}
+                  size="small"
+                  variant={node.id === currentNodeId ? "filled" : "outlined"}
+                  color={node.id === currentNodeId ? "primary" : "default"}
                   onClick={() => setCurrentNodeId(node.id)}
-                  className={`
-                    cursor-pointer px-2 py-1 rounded
-                    ${node.id === currentNodeId 
-                      ? 'bg-indigo-100 text-indigo-700 font-medium border border-indigo-200' 
-                      : 'text-gray-600 hover:bg-gray-100 border border-transparent'}
-                  `}
-                >
-                  {node.question.length > 30 
-                    ? node.question.substring(0, 30) + '...' 
-                    : node.question}
-                </span>
+                  clickable
+                />
                 {index < path.length - 1 && (
-                  <svg className="w-4 h-4 text-gray-400 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
-                  </svg>
+                  <Typography sx={{ color: 'text.disabled', mx: 0.5 }}>
+                    /
+                  </Typography>
                 )}
               </React.Fragment>
             ))}
-          </div>
-        </div>
+          </Box>
+        </Paper>
       )}
-    </div>
+    </Box>
   );
 };
 
