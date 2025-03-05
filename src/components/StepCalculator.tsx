@@ -1,11 +1,30 @@
 import React, { useState } from 'react';
 import { DecisionNode, decisionTree, Edition, editions } from '@/data/licenseData';
+import {
+  Box,
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  Divider,
+  LinearProgress,
+  Stack,
+  Typography,
+  Alert,
+  IconButton,
+  useTheme
+} from '@mui/material';
+import ThumbUpAltIcon from '@mui/icons-material/ThumbUpAlt';
+import ThumbDownAltIcon from '@mui/icons-material/ThumbDownAlt';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import RestartAltIcon from '@mui/icons-material/RestartAlt';
 
 interface StepCalculatorProps {
   onEditionSelect: (edition: Edition | null) => void;
 }
 
 const StepCalculator: React.FC<StepCalculatorProps> = ({ onEditionSelect }) => {
+  const theme = useTheme();
   const [currentNodeId, setCurrentNodeId] = useState<string>('root');
   const [history, setHistory] = useState<string[]>([]);
   const [answers, setAnswers] = useState<Record<string, boolean>>({});
@@ -87,116 +106,118 @@ const StepCalculator: React.FC<StepCalculatorProps> = ({ onEditionSelect }) => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-      {/* Шапка калькулятора */}
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-700 p-6 text-white">
-        <h2 className="text-2xl font-bold">
-          Калькулятор редакции Deckhouse
-        </h2>
-        <p className="opacity-80 mt-1">
-          {isEndNode 
-            ? 'Мы подобрали подходящую редакцию для ваших требований' 
-            : 'Ответьте на несколько вопросов для подбора оптимальной редакции'}
-        </p>
-      </div>
+    <Card variant="outlined">
+      <CardHeader
+        title={isEndNode ? "Рекомендуемая редакция" : "Калькулятор выбора редакции"}
+        subheader={isEndNode 
+          ? "Мы подобрали подходящую редакцию для ваших требований" 
+          : "Ответьте на вопросы для подбора оптимальной редакции"
+        }
+        sx={{ 
+          bgcolor: theme.palette.primary.main, 
+          color: theme.palette.primary.contrastText,
+          '& .MuiCardHeader-subheader': { 
+            color: theme.palette.primary.contrastText, 
+            opacity: 0.8 
+          }
+        }}
+      />
       
       {/* Индикатор прогресса */}
-      <div className="px-6 pt-4">
-        <div className="w-full bg-gray-200 rounded-full h-2.5">
-          <div 
-            className="bg-blue-600 h-2.5 rounded-full transition-all duration-500 ease-out"
-            style={{ width: `${getProgress()}%` }}
-          />
-        </div>
-        <div className="flex justify-between text-xs text-gray-500 mt-1">
-          <span>Начало</span>
-          <span>Прогресс: {getProgress()}%</span>
-          <span>Результат</span>
-        </div>
-      </div>
+      <Box sx={{ px: 2, pt: 2 }}>
+        <LinearProgress 
+          variant="determinate" 
+          value={getProgress()} 
+          sx={{ height: 8, borderRadius: 4 }}
+        />
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 0.5 }}>
+          <Typography variant="caption" color="text.secondary">Начало</Typography>
+          <Typography variant="caption" color="text.secondary">
+            Прогресс: {getProgress()}%
+          </Typography>
+          <Typography variant="caption" color="text.secondary">Результат</Typography>
+        </Box>
+      </Box>
       
-      {/* Тело калькулятора */}
-      <div className="p-6">
+      <CardContent>
         {/* Вопрос */}
-        <div className="mb-8">
-          <h3 className="text-lg font-semibold text-gray-800 mb-3">
+        <Box sx={{ mb: 3 }}>
+          <Typography variant="h6" gutterBottom>
             {currentNode.question}
-          </h3>
+          </Typography>
           
           {currentNode.featureId && (
-            <div className="bg-blue-50 border-l-4 border-blue-400 p-4 text-sm text-blue-700">
-              <p>
-                Данный пункт влияет на выбор редакции и доступность ключевых функций платформы.
-              </p>
-            </div>
+            <Alert severity="info" sx={{ mt: 1 }}>
+              Данный пункт влияет на выбор редакции и доступность ключевых функций платформы.
+            </Alert>
           )}
-        </div>
+        </Box>
         
         {/* Кнопки ответов */}
         {!isEndNode ? (
-          <div className="flex flex-col space-y-3 sm:flex-row sm:space-y-0 sm:space-x-4">
+          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
             {currentNode.yes && (
-              <button
+              <Button
+                variant="contained"
+                color="success"
+                size="large"
+                fullWidth
+                startIcon={<ThumbUpAltIcon />}
                 onClick={() => handleAnswer(true)}
-                className="flex-1 py-3 px-5 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg shadow transition duration-200 flex items-center justify-center"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5 mr-2">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                </svg>
                 Да
-              </button>
+              </Button>
             )}
             
             {currentNode.no && (
-              <button
+              <Button
+                variant="contained"
+                color="error"
+                size="large"
+                fullWidth
+                startIcon={<ThumbDownAltIcon />}
                 onClick={() => handleAnswer(false)}
-                className="flex-1 py-3 px-5 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg shadow transition duration-200 flex items-center justify-center"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5 mr-2">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
                 Нет
-              </button>
+              </Button>
             )}
-          </div>
+          </Stack>
         ) : (
-          <button
+          <Button
+            variant="contained"
+            color="primary"
+            size="large"
+            fullWidth
+            startIcon={<RestartAltIcon />}
             onClick={handleReset}
-            className="w-full py-3 px-5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow transition duration-200"
           >
             Начать заново
-          </button>
+          </Button>
         )}
-      </div>
+      </CardContent>
+      
+      <Divider />
       
       {/* Навигация и история */}
-      <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-between">
-        <button
-          onClick={handleBack}
-          className={`flex items-center text-sm font-medium ${
-            history.length > 0 
-              ? 'text-blue-600 hover:text-blue-800' 
-              : 'text-gray-400 cursor-not-allowed'
-          }`}
+      <Box sx={{ px: 2, py: 1.5, bgcolor: 'background.default', display: 'flex', justifyContent: 'space-between' }}>
+        <Button
+          startIcon={<ArrowBackIcon />}
           disabled={history.length === 0}
+          onClick={handleBack}
+          size="small"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4 mr-1">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
-          </svg>
           Назад
-        </button>
+        </Button>
         
-        <button
+        <Button
+          startIcon={<RestartAltIcon />}
           onClick={handleReset}
-          className="flex items-center text-sm font-medium text-gray-600 hover:text-gray-800"
+          size="small"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4 mr-1">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
-          </svg>
           Начать заново
-        </button>
-      </div>
-    </div>
+        </Button>
+      </Box>
+    </Card>
   );
 };
 
