@@ -1,53 +1,59 @@
 import React, { useMemo } from 'react';
 import { Edition, Feature, FeatureStatus, features, CATEGORIES } from '@/data/licenseData';
+import {
+  Box,
+  Card,
+  CardActions,
+  CardContent,
+  CardHeader,
+  Chip,
+  CircularProgress,
+  Divider,
+  Link,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Typography,
+  useTheme
+} from '@mui/material';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import CategoryIcon from '@mui/icons-material/Category';
 
 interface EditionCardProps {
   edition: Edition;
   features: Feature[];
 }
 
-type StatusInfo = { label: string; color: string; icon: JSX.Element };
-
 // Компонент для более наглядного отображения статуса функции
 const EditionCard: React.FC<EditionCardProps> = ({ edition, features }) => {
-  const statusConfig = useMemo<Record<FeatureStatus, StatusInfo>>(() => ({
+  const theme = useTheme();
+  
+  const statusConfig = useMemo<Record<FeatureStatus, { icon: JSX.Element; color: string; label: string }>>(() => ({
     'present': {
-      label: 'Доступно',
-      color: 'bg-green-100 text-green-800 border-green-200',
-      icon: (
-        <svg className="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-        </svg>
-      )
+      icon: <CheckCircleOutlineIcon color="success" />,
+      color: theme.palette.success.main,
+      label: 'Доступно'
     },
     'absent': {
-      label: 'Недоступно',
-      color: 'bg-red-50 text-red-700 border-red-200',
-      icon: (
-        <svg className="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-          <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-        </svg>
-      )
+      icon: <CancelOutlinedIcon color="error" />,
+      color: theme.palette.error.main,
+      label: 'Недоступно'
     },
     'planned': {
-      label: 'Планируется',
-      color: 'bg-yellow-50 text-yellow-700 border-yellow-200',
-      icon: (
-        <svg className="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
-        </svg>
-      )
+      icon: <AccessTimeIcon color="warning" />,
+      color: theme.palette.warning.main,
+      label: 'Планируется'
     },
     'conditionally-available': {
-      label: 'Условно',
-      color: 'bg-blue-50 text-blue-700 border-blue-200',
-      icon: (
-        <svg className="w-5 h-5 text-blue-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-          <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-        </svg>
-      )
+      icon: <InfoOutlinedIcon color="info" />,
+      color: theme.palette.info.main,
+      label: 'Условно'
     }
-  }), []);
+  }), [theme]);
 
   // Фильтруем и группируем функции по категориям для лучшей организации
   const groupedFeatures = useMemo(() => {
@@ -84,98 +90,144 @@ const EditionCard: React.FC<EditionCardProps> = ({ edition, features }) => {
     };
   }, [edition.features, features.length]);
 
+  const showSpecialBadge = (id: string) => {
+    if (id.includes('cert')) {
+      return <Chip size="small" color="primary" label="ФСТЭК" sx={{ mr: 1 }} />;
+    }
+    if (id === 'community') {
+      return <Chip size="small" color="success" label="Open Source" sx={{ mr: 1 }} />;
+    }
+    return null;
+  };
+
   return (
-    <div className="bg-white shadow-xl rounded-lg overflow-hidden border border-gray-200">
-      {/* Шапка карточки */}
-      <div className="bg-gradient-to-r from-indigo-600 to-blue-500 p-6 text-white">
-        <div className="flex justify-between items-start">
-          <div>
-            <h2 className="text-2xl font-bold">{edition.name}</h2>
-            <p className="text-indigo-100 mt-1">{edition.description}</p>
-          </div>
-          
-          {/* Индикатор полноты функций */}
-          <div className="flex flex-col items-center bg-white bg-opacity-20 p-2 rounded-lg">
-            <svg className="w-12 h-12" viewBox="0 0 36 36">
-              <path
-                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                fill="none"
-                stroke="#E2E8F0"
-                strokeWidth="3"
-                strokeDasharray="100, 100"
-              />
-              <path
-                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                fill="none"
-                stroke="white"
-                strokeWidth="3"
-                strokeDasharray={`${featureStats.percentage}, 100`}
-              />
-              <text x="18" y="21" textAnchor="middle" fill="white" fontSize="10" fontWeight="bold">
+    <Card variant="outlined">
+      <CardHeader
+        title={
+          <Box display="flex" alignItems="center">
+            {showSpecialBadge(edition.id)}
+            <Typography variant="h6">{edition.name}</Typography>
+          </Box>
+        }
+        subheader={edition.description}
+        titleTypographyProps={{ component: 'div' }}
+        action={
+          <Box position="relative" display="inline-flex">
+            <CircularProgress 
+              variant="determinate" 
+              value={featureStats.percentage} 
+              size={40} 
+            />
+            <Box
+              sx={{
+                top: 0,
+                left: 0,
+                bottom: 0,
+                right: 0,
+                position: 'absolute',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Typography variant="caption" color="text.secondary">
                 {featureStats.percentage}%
-              </text>
-            </svg>
-            <span className="text-xs mt-1 text-center">Доступных функций</span>
-          </div>
-        </div>
-        
-        <div className="flex justify-between mt-4 text-xs text-indigo-100">
-          <span>{featureStats.available} из {featureStats.total} функций</span>
-          <span className="border border-indigo-300 px-2 py-1 rounded-full">
-            ID: {edition.id}
-          </span>
-        </div>
-      </div>
+              </Typography>
+            </Box>
+          </Box>
+        }
+        sx={{ 
+          bgcolor: theme.palette.primary.main, 
+          color: theme.palette.primary.contrastText,
+          '& .MuiCardHeader-subheader': { 
+            color: theme.palette.primary.contrastText, 
+            opacity: 0.8 
+          }
+        }}
+      />
       
-      {/* Основной контент */}
-      <div className="p-6">
+      <CardContent sx={{ p: 0, maxHeight: 400, overflow: 'auto' }}>
         {Object.entries(groupedFeatures).map(([category, categoryFeatures]) => (
-          <div key={category} className="mb-6 last:mb-0">
-            <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">
-              {category}
-            </h3>
-            <ul className="space-y-3">
+          <Box key={category} sx={{ mb: 1 }}>
+            <Box 
+              sx={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                px: 2, 
+                py: 1,
+                bgcolor: 'action.hover'
+              }}
+            >
+              <CategoryIcon fontSize="small" sx={{ mr: 1 }} />
+              <Typography variant="subtitle2">{category}</Typography>
+            </Box>
+            
+            <List dense disablePadding>
               {categoryFeatures.map(feature => {
                 const status = edition.features[feature.id] || 'absent';
-                const { label, color, icon } = statusConfig[status];
+                const { icon, label } = statusConfig[status];
                 
                 return (
-                  <li 
+                  <ListItem 
                     key={feature.id} 
-                    className="flex items-center p-3 rounded-lg border border-gray-100 hover:bg-gray-50 transition-colors"
+                    divider
+                    secondaryAction={
+                      <Chip 
+                        label={label} 
+                        size="small" 
+                        color={
+                          status === 'present' ? 'success' : 
+                          status === 'planned' ? 'warning' : 
+                          status === 'conditionally-available' ? 'info' : 'error'
+                        }
+                        variant="outlined"
+                      />
+                    }
                   >
-                    <div className="flex-shrink-0 mr-3">
+                    <ListItemIcon sx={{ minWidth: 36 }}>
                       {icon}
-                    </div>
-                    <div className="flex-grow">
-                      <div className="flex justify-between">
-                        <p className="text-sm font-medium text-gray-800">{feature.name}</p>
-                        <span className={`text-xs px-2 py-1 rounded-full border ${color}`}>
-                          {label}
-                        </span>
-                      </div>
-                      <p className="text-xs text-gray-500 mt-1">{feature.description}</p>
-                    </div>
-                  </li>
+                    </ListItemIcon>
+                    <ListItemText 
+                      primary={feature.name}
+                      secondary={feature.importance >= 8 ? 'Важно' : null}
+                      primaryTypographyProps={{ variant: 'body2' }}
+                      secondaryTypographyProps={{ 
+                        variant: 'caption',
+                        color: 'error'
+                      }}
+                    />
+                  </ListItem>
                 );
               })}
-            </ul>
-          </div>
+            </List>
+          </Box>
         ))}
-      </div>
+      </CardContent>
       
-      {/* Подвал карточки */}
-      <div className="p-6 bg-gray-50 border-t border-gray-200">
-        <a 
-          href="https://deckhouse.ru/products/kubernetes-platform/pricing/" 
+      <Divider />
+      
+      <CardActions sx={{ p: 2, justifyContent: 'center' }}>
+        <Link
+          href="https://deckhouse.ru/products/kubernetes-platform/pricing/"
           target="_blank"
           rel="noopener noreferrer"
-          className="block w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg text-center shadow transition duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          underline="none"
+          sx={{
+            bgcolor: theme.palette.primary.main,
+            color: theme.palette.primary.contrastText,
+            py: 1,
+            px: 3,
+            borderRadius: 1,
+            display: 'inline-block',
+            '&:hover': {
+              bgcolor: theme.palette.primary.dark,
+            }
+          }}
         >
           Подробнее о лицензировании
-        </a>
-      </div>
-    </div>
+        </Link>
+      </CardActions>
+    </Card>
   );
 };
 
