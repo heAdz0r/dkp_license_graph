@@ -2,12 +2,12 @@ import React, { useMemo, useState } from 'react';
 import { Edition, Feature, editions, features, CATEGORIES } from '@/data/licenseData';
 import {
   Box,
+  Button,
   Card,
   CardContent,
   Chip,
   FormControl,
   Grid,
-  IconButton,
   MenuItem,
   Paper,
   Select,
