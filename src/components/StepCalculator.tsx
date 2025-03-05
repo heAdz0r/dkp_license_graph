@@ -10,21 +10,14 @@ import {
   LinearProgress,
   Stack,
   Typography,
-  Alert,
-  IconButton,
-  useTheme
+  Alert
 } from '@mui/material';
-import ThumbUpAltIcon from '@mui/icons-material/ThumbUpAlt';
-import ThumbDownAltIcon from '@mui/icons-material/ThumbDownAlt';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import RestartAltIcon from '@mui/icons-material/RestartAlt';
 
 interface StepCalculatorProps {
   onEditionSelect: (edition: Edition | null) => void;
 }
 
 const StepCalculator: React.FC<StepCalculatorProps> = ({ onEditionSelect }) => {
-  const theme = useTheme();
   const [currentNodeId, setCurrentNodeId] = useState<string>('root');
   const [history, setHistory] = useState<string[]>([]);
   const [answers, setAnswers] = useState<Record<string, boolean>>({});
@@ -114,10 +107,10 @@ const StepCalculator: React.FC<StepCalculatorProps> = ({ onEditionSelect }) => {
           : "Ответьте на вопросы для подбора оптимальной редакции"
         }
         sx={{ 
-          bgcolor: theme.palette.primary.main, 
-          color: theme.palette.primary.contrastText,
+          bgcolor: 'primary.main', 
+          color: 'primary.contrastText',
           '& .MuiCardHeader-subheader': { 
-            color: theme.palette.primary.contrastText, 
+            color: 'primary.contrastText', 
             opacity: 0.8 
           }
         }}
@@ -162,7 +155,6 @@ const StepCalculator: React.FC<StepCalculatorProps> = ({ onEditionSelect }) => {
                 color="success"
                 size="large"
                 fullWidth
-                startIcon={<ThumbUpAltIcon />}
                 onClick={() => handleAnswer(true)}
               >
                 Да
@@ -175,7 +167,6 @@ const StepCalculator: React.FC<StepCalculatorProps> = ({ onEditionSelect }) => {
                 color="error"
                 size="large"
                 fullWidth
-                startIcon={<ThumbDownAltIcon />}
                 onClick={() => handleAnswer(false)}
               >
                 Нет
@@ -188,7 +179,6 @@ const StepCalculator: React.FC<StepCalculatorProps> = ({ onEditionSelect }) => {
             color="primary"
             size="large"
             fullWidth
-            startIcon={<RestartAltIcon />}
             onClick={handleReset}
           >
             Начать заново
@@ -201,7 +191,6 @@ const StepCalculator: React.FC<StepCalculatorProps> = ({ onEditionSelect }) => {
       {/* Навигация и история */}
       <Box sx={{ px: 2, py: 1.5, bgcolor: 'background.default', display: 'flex', justifyContent: 'space-between' }}>
         <Button
-          startIcon={<ArrowBackIcon />}
           disabled={history.length === 0}
           onClick={handleBack}
           size="small"
@@ -210,7 +199,6 @@ const StepCalculator: React.FC<StepCalculatorProps> = ({ onEditionSelect }) => {
         </Button>
         
         <Button
-          startIcon={<RestartAltIcon />}
           onClick={handleReset}
           size="small"
         >
