@@ -12,16 +12,10 @@ import {
   Link,
   List,
   ListItem,
-  ListItemIcon,
   ListItemText,
   Typography,
   useTheme
 } from '@mui/material';
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
-import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
-import AccessTimeIcon from '@mui/icons-material/AccessTime';
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import CategoryIcon from '@mui/icons-material/Category';
 
 interface EditionCardProps {
   edition: Edition;
@@ -32,24 +26,20 @@ interface EditionCardProps {
 const EditionCard: React.FC<EditionCardProps> = ({ edition, features }) => {
   const theme = useTheme();
   
-  const statusConfig = useMemo<Record<FeatureStatus, { icon: JSX.Element; color: string; label: string }>>(() => ({
+  const statusConfig = useMemo<Record<FeatureStatus, { color: string; label: string }>>(() => ({
     'present': {
-      icon: <CheckCircleOutlineIcon color="success" />,
       color: theme.palette.success.main,
       label: 'Доступно'
     },
     'absent': {
-      icon: <CancelOutlinedIcon color="error" />,
       color: theme.palette.error.main,
       label: 'Недоступно'
     },
     'planned': {
-      icon: <AccessTimeIcon color="warning" />,
       color: theme.palette.warning.main,
       label: 'Планируется'
     },
     'conditionally-available': {
-      icon: <InfoOutlinedIcon color="info" />,
       color: theme.palette.info.main,
       label: 'Условно'
     }
@@ -158,14 +148,13 @@ const EditionCard: React.FC<EditionCardProps> = ({ edition, features }) => {
                 bgcolor: 'action.hover'
               }}
             >
-              <CategoryIcon fontSize="small" sx={{ mr: 1 }} />
               <Typography variant="subtitle2">{category}</Typography>
             </Box>
             
             <List dense disablePadding>
               {categoryFeatures.map(feature => {
                 const status = edition.features[feature.id] || 'absent';
-                const { icon, label } = statusConfig[status];
+                const { label } = statusConfig[status];
                 
                 return (
                   <ListItem 
@@ -184,9 +173,6 @@ const EditionCard: React.FC<EditionCardProps> = ({ edition, features }) => {
                       />
                     }
                   >
-                    <ListItemIcon sx={{ minWidth: 36 }}>
-                      {icon}
-                    </ListItemIcon>
                     <ListItemText 
                       primary={feature.name}
                       secondary={feature.importance >= 8 ? 'Важно' : null}
