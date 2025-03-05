@@ -1,0 +1,402 @@
+/* src/styles/calculator.css - Оптимизированные стили для калькулятора и графа решений */
+
+/* Переменные темы */
+:root {
+  /* Основные цвета */
+  --primary: #4f46e5;
+  --primary-light: #818cf8;
+  --primary-dark: #3730a3;
+  --secondary: #10b981;
+  --error: #ef4444;
+  --warning: #f59e0b;
+
+  /* Градиенты и эффекты */
+  --primary-gradient: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%);
+  --primary-gradient-hover: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #eff6ff 100%);
+  --success-gradient: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+
+  /* Тени */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.08), 0 4px 6px rgba(0, 0, 0, 0.05);
+  --shadow-focus: 0 0 0 3px rgba(79, 70, 229, 0.25);
+
+  /* Цвета фона и текста */
+  --gray-50: #f9fafb;
+  --gray-100: #f3f4f6;
+  --gray-200: #e5e7eb;
+  --gray-300: #d1d5db;
+  --gray-400: #9ca3af;
+  --gray-500: #6b7280;
+  --gray-600: #4b5563;
+  --gray-700: #374151;
+  --gray-800: #1f2937;
+  --gray-900: #111827;
+
+  /* Радиусы и переходы */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+  --transition-fast: 0.15s ease;
+  --transition-base: 0.2s ease-in-out;
+  --transition-slow: 0.3s ease;
+}
+
+/* Основные контейнеры */
+.calculator-container {
+  transition: var(--transition-base);
+  position: relative;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Стилизация SVG-дерева решений */
+.decision-tree-container {
+  width: 100%;
+  height: 600px;
+  max-height: 80vh;
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  background-color: white;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--gray-200);
+}
+
+.controls-panel {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 10;
+  background-color: white;
+  padding: 8px;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--gray-200);
+  display: flex;
+  gap: 5px;
+}
+
+.legend-panel {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  z-index: 10;
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 8px 12px;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--gray-200);
+  display: flex;
+  gap: 10px;
+  font-size: 0.75rem;
+}
+
+/* Стили для узлов дерева */
+.node-rect {
+  transition: all var(--transition-base);
+}
+
+.node-rect:hover {
+  filter: brightness(1.05);
+}
+
+.node text {
+  pointer-events: none;
+}
+
+/* Стили для связей */
+.link {
+  transition: stroke 0.3s ease;
+}
+
+/* Улучшенные стили для пошагового калькулятора */
+.step-calculator {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  background: white;
+  border: 1px solid var(--gray-200);
+}
+
+.step-header {
+  background: var(--primary-gradient);
+  padding: 1.5rem;
+  color: white;
+}
+
+.progress-container {
+  padding: 1rem 1.5rem;
+  background-color: var(--gray-50);
+  border-bottom: 1px solid var(--gray-200);
+}
+
+.progress-bar {
+  height: 8px;
+  width: 100%;
+  background-color: var(--gray-200);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-indicator {
+  height: 100%;
+  background-color: var(--primary);
+  transition: width 0.5s ease;
+  border-radius: 4px;
+}
+
+.step-content {
+  padding: 1.5rem;
+}
+
+.step-question {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--gray-800);
+  margin-bottom: 1rem;
+}
+
+.step-description {
+  color: var(--gray-600);
+  margin-bottom: 1.5rem;
+}
+
+.info-box {
+  background-color: rgba(79, 70, 229, 0.1);
+  border-left: 4px solid var(--primary);
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+
+/* Стили для кнопок */
+.btn-primary {
+  background: var(--primary-gradient);
+  color: white;
+  font-weight: 600;
+  padding: 0.75rem 1.25rem;
+  border-radius: var(--radius-md);
+  transition: all var(--transition-base);
+  border: none;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btn-primary:hover {
+  background: var(--primary-gradient-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-secondary {
+  background-color: white;
+  color: var(--gray-700);
+  font-weight: 600;
+  padding: 0.75rem 1.25rem;
+  border-radius: var(--radius-md);
+  transition: all var(--transition-base);
+  border: 1px solid var(--gray-300);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btn-secondary:hover {
+  background-color: var(--gray-50);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-yes {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+}
+
+.btn-yes:hover {
+  background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+}
+
+.btn-no {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+}
+
+.btn-no:hover {
+  background: linear-gradient(135deg, #f87171 0%, #ef4444 100%);
+}
+
+/* Анимации */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+.pulse {
+  animation: pulse 1.5s infinite;
+}
+
+/* Адаптивность для мобильных устройств */
+@media (max-width: 640px) {
+  .decision-tree-container {
+    height: 400px;
+  }
+  
+  .step-header {
+    padding: 1rem;
+  }
+  
+  .step-content {
+    padding: 1rem;
+  }
+  
+  .controls-panel {
+    top: auto;
+    bottom: 10px;
+    right: 10px;
+  }
+}
+
+/* Утилиты для компоновки */
+.row {
+  display: flex;
+  flex-direction: row;
+}
+
+.col {
+  display: flex;
+  flex-direction: column;
+}
+
+.gap-1 {
+  gap: 0.25rem;
+}
+
+.gap-2 {
+  gap: 0.5rem;
+}
+
+.space-between {
+  justify-content: space-between;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.flex-grow {
+  flex-grow: 1;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-right {
+  text-align: right;
+}
+
+/* Стили для дерева решений */
+.node {
+  cursor: pointer;
+}
+
+.node-active {
+  filter: drop-shadow(0 0 8px rgba(79, 70, 229, 0.5));
+}
+
+.node-result {
+  filter: drop-shadow(0 0 8px rgba(16, 185, 129, 0.5));
+}
+
+.edge-label {
+  pointer-events: none;
+}
+
+/* Специальные иконки и индикаторы */
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+}
+
+.legend-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+}
+
+.legend-question {
+  background-color: white;
+  border: 1px solid var(--gray-300);
+}
+
+.legend-active {
+  background-color: var(--primary);
+}
+
+.legend-result {
+  background-color: var(--secondary);
+}
+
+/* Панель пути */
+.path-container {
+  display: flex;
+  padding: 0.5rem;
+  background-color: var(--gray-50);
+  border-radius: var(--radius-md);
+  overflow-x: auto;
+  gap: 0.5rem;
+  border: 1px solid var(--gray-200);
+  margin-top: 1rem;
+}
+
+.path-item {
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.path-item:hover {
+  background-color: var(--gray-100);
+}
+
+.path-item-active {
+  background-color: var(--primary-light);
+  color: white;
+}
+
+.path-separator {
+  display: flex;
+  align-items: center;
+  color: var(--gray-400);
+}
