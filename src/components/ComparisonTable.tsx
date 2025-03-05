@@ -22,12 +22,6 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
-import CheckIcon from '@mui/icons-material/Check';
-import CloseIcon from '@mui/icons-material/Close';
-import AccessTimeIcon from '@mui/icons-material/AccessTime';
-import InfoIcon from '@mui/icons-material/Info';
-import FilterListIcon from '@mui/icons-material/FilterList';
-import RefreshIcon from '@mui/icons-material/Refresh';
 
 interface ComparisonTableProps {
   selectedEditions?: Edition[];
@@ -62,21 +56,21 @@ const ComparisonTable: React.FC<ComparisonTableProps> = ({ selectedEditions }) =
     });
   }, [activeCategory, minImportance]);
   
-  // Рендер иконки для статуса функции
+  // Рендер статуса функции используя текст вместо иконок
   const renderFeatureStatus = (edition: Edition, featureId: string) => {
     const status = edition.features[featureId];
     
     switch (status) {
       case 'present':
-        return <CheckIcon fontSize="small" color="success" />;
+        return <Box sx={{ color: 'success.main', fontWeight: 'bold' }}>✓</Box>;
       case 'absent':
-        return <CloseIcon fontSize="small" color="error" />;
+        return <Box sx={{ color: 'error.main', fontWeight: 'bold' }}>✗</Box>;
       case 'planned':
-        return <AccessTimeIcon fontSize="small" color="warning" />;
+        return <Box sx={{ color: 'warning.main', fontWeight: 'bold' }}>⏱</Box>;
       case 'conditionally-available':
-        return <InfoIcon fontSize="small" color="info" />;
+        return <Box sx={{ color: 'info.main', fontWeight: 'bold' }}>!</Box>;
       default:
-        return <CloseIcon fontSize="small" color="disabled" />;
+        return <Box sx={{ color: 'text.disabled', fontWeight: 'bold' }}>-</Box>;
     }
   };
 
@@ -107,7 +101,6 @@ const ComparisonTable: React.FC<ComparisonTableProps> = ({ selectedEditions }) =
         <Grid container spacing={2} sx={{ mb: 2 }}>
           <Grid item xs={12} md={6}>
             <Box display="flex" alignItems="center">
-              <FilterListIcon sx={{ mr: 1 }} />
               <FormControl size="small" fullWidth>
                 <Select
                   value={activeCategory || ''}
@@ -134,9 +127,13 @@ const ComparisonTable: React.FC<ComparisonTableProps> = ({ selectedEditions }) =
                 valueLabelDisplay="auto"
                 sx={{ flex: 1 }}
               />
-              <IconButton size="small" onClick={handleResetFilters}>
-                <RefreshIcon fontSize="small" />
-              </IconButton>
+              <Button
+                size="small"
+                variant="outlined"
+                onClick={handleResetFilters}
+              >
+                Сбросить
+              </Button>
             </Stack>
           </Grid>
         </Grid>
@@ -144,29 +141,25 @@ const ComparisonTable: React.FC<ComparisonTableProps> = ({ selectedEditions }) =
         {/* Легенда */}
         <Box sx={{ mb: 2, display: 'flex', gap: 2, flexWrap: 'wrap' }}>
           <Chip 
-            icon={<CheckIcon fontSize="small" />} 
-            label="Есть" 
+            label="✓ Есть" 
             size="small" 
             color="success" 
             variant="outlined" 
           />
           <Chip 
-            icon={<CloseIcon fontSize="small" />} 
-            label="Нет" 
+            label="✗ Нет" 
             size="small" 
             color="error" 
             variant="outlined" 
           />
           <Chip 
-            icon={<AccessTimeIcon fontSize="small" />} 
-            label="Планируется" 
+            label="⏱ Планируется" 
             size="small" 
             color="warning" 
             variant="outlined" 
           />
           <Chip 
-            icon={<InfoIcon fontSize="small" />} 
-            label="Условно" 
+            label="! Условно" 
             size="small" 
             color="info" 
             variant="outlined" 
