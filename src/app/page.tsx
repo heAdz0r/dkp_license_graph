@@ -3,14 +3,25 @@
 import React, { useState, useCallback } from "react";
 import dynamic from 'next/dynamic';
 import StepCalculator from "@/components/StepCalculator";
+import EnhancedCalculator from "@/components/EnhancedCalculator";
 import EditionCard from "@/components/EditionCard";
 import ComparisonTable from "@/components/ComparisonTable";
 import { Edition, features } from "@/data/licenseData";
 
-// Динамический импорт компонента визуализации графа для оптимизации производительности
+// Динамический импорт компонентов визуализации для оптимизации производительности
 const DecisionTree = dynamic(() => import("@/components/DecisionTree"), {
   ssr: false,
-  loading: () => <div className="w-full h-96 bg-gray-100 rounded-lg flex items-center justify-center">
+  loading: () => <LoadingVisualizer />
+});
+
+const EnhancedDecisionTree = dynamic(() => import("@/components/EnhancedDecisionTree"), {
+  ssr: false,
+  loading: () => <LoadingVisualizer />
+});
+
+// Компонент для отображения загрузки визуализации
+const LoadingVisualizer = () => (
+  <div className="w-full h-96 bg-gray-100 rounded-lg flex items-center justify-center">
     <div className="flex flex-col items-center text-gray-500">
       <svg className="w-10 h-10 text-gray-300 mb-3 animate-spin" viewBox="0 0 24 24" fill="none">
         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
@@ -19,7 +30,7 @@ const DecisionTree = dynamic(() => import("@/components/DecisionTree"), {
       <div>Загрузка визуализации графа решений...</div>
     </div>
   </div>
-});
+);
 
 export default function Home() {
   // Состояние для выбранной редакции
@@ -30,6 +41,9 @@ export default function Home() {
   
   // Состояние для переключения между калькулятором и визуализацией
   const [viewMode, setViewMode] = useState<'calculator' | 'visualization'>('calculator');
+  
+  // Состояние для переключения между базовыми и улучшенными компонентами
+  const [useEnhanced, setUseEnhanced] = useState(true);
   
   // Функция для выбора редакции
   const handleEditionSelect = useCallback((edition: Edition | null) => {
@@ -76,6 +90,19 @@ export default function Home() {
             </svg>
             Визуализация графа
           </button>
+          
+          <div className="ml-auto flex items-center gap-2">
+            <span className="text-sm text-gray-600">Улучшенный интерфейс:</span>
+            <button
+              onClick={() => setUseEnhanced(!useEnhanced)}
+              className={`w-12 h-6 flex items-center rounded-full p-1 ${
+                useEnhanced ? 'bg-indigo-600 justify-end' : 'bg-gray-300 justify-start'
+              } transition-all duration-300`}
+              aria-label={useEnhanced ? "Отключить улучшенный интерфейс" : "Включить улучшенный интерфейс"}
+            >
+              <div className="bg-white w-4 h-4 rounded-full shadow-md"></div>
+            </button>
+          </div>
         </div>
       </div>
       
@@ -84,17 +111,32 @@ export default function Home() {
         {/* Левая колонка (2/3 ширины на больших экранах) */}
         <div className={`${viewMode === 'visualization' ? 'lg:col-span-3' : 'lg:col-span-2'}`}>
           {viewMode === 'calculator' ? (
-            <StepCalculator onEditionSelect={handleEditionSelect} />
+            useEnhanced ? (
+              <EnhancedCalculator 
+                onEditionSelect={handleEditionSelect} 
+                selectedEdition={selectedEdition}
+              />
+            ) : (
+              <StepCalculator onEditionSelect={handleEditionSelect} />
+            )
           ) : (
             <div className="bg-white rounded-lg shadow-lg border border-gray-200">
               <div className="p-5 border-b border-gray-200">
                 <h2 className="text-xl font-bold mb-2">Интерактивный граф принятия решений</h2>
                 <p className="text-gray-600">
                   Визуализация процесса выбора редакции на основе ваших требований. Взаимодействуйте с графом,
-                  используя масштабирование, перемещение и клики по узлам для навигации по варианта выбора.
+                  используя масштабирование, перемещение и клики по узлам для навигации по вариантам выбора.
                 </p>
               </div>
-              <DecisionTree onEditionSelect={handleEditionSelect} />
+              {useEnhanced ? (
+                <EnhancedDecisionTree 
+                  onEditionSelect={handleEditionSelect}
+                  width={1000}
+                  height={700}
+                />
+              ) : (
+                <DecisionTree onEditionSelect={handleEditionSelect} />
+              )}
             </div>
           )}
         </div>
@@ -195,7 +237,7 @@ export default function Home() {
       
       {/* Результаты выбора в режиме визуализации */}
       {viewMode === 'visualization' && selectedEdition && (
-        <div className="bg-white rounded-lg shadow-lg p-6 border border-gray-200 mt-6">
+        <div className="bg-white rounded-lg shadow-lg p-6 border border-gray-200 animate-fadeIn">
           <div className="flex flex-col lg:flex-row gap-8 items-start">
             <div className="lg:w-2/3">
               <h2 className="text-2xl font-bold text-gray-800 mb-4">Выбранная редакция</h2>
@@ -278,7 +320,7 @@ export default function Home() {
       
       {/* Секция полного сравнения (отображается, если включено) */}
       {showFullComparison && (
-        <div className="bg-white rounded-lg shadow-lg p-6 border border-gray-200">
+        <div className="bg-white rounded-lg shadow-lg p-6 border border-gray-200 animate-fadeIn">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-gray-800">Полное сравнение редакций</h2>
             <button
@@ -294,6 +336,27 @@ export default function Home() {
           <ComparisonTable
             selectedEditions={selectedEdition ? [selectedEdition] : undefined}
           />
+        </div>
+      )}
+      
+      {/* Информационная плашка о улучшенном интерфейсе */}
+      {useEnhanced && (
+        <div className="fixed bottom-4 left-4 max-w-xs bg-blue-600 text-white p-3 rounded-lg shadow-lg animate-fadeIn flex items-start">
+          <svg className="w-5 h-5 mr-2 flex-shrink-0 mt-0.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <div>
+            <p className="text-sm font-medium">Включен улучшенный интерфейс</p>
+            <p className="text-xs mt-1 text-blue-100">Используются новые компоненты с расширенными возможностями навигации, зумирования и визуализации</p>
+          </div>
+          <button 
+            className="ml-2 text-blue-200 hover:text-white" 
+            onClick={() => setUseEnhanced(false)}
+          >
+            <svg className="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
         </div>
       )}
     </div>
