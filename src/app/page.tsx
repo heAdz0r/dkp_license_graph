@@ -19,9 +19,6 @@ import {
   Paper,
   Alert
 } from '@mui/material';
-import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
-import AccountTreeIcon from '@mui/icons-material/AccountTree';
-import CalculateIcon from '@mui/icons-material/Calculate';
 
 // Динамический импорт компонента визуализации графа для оптимизации производительности
 const DecisionTree = dynamic(() => import("@/components/DecisionTree"), {
@@ -71,14 +68,10 @@ export default function Home() {
                 <Tab 
                   value="calculator" 
                   label="Калькулятор" 
-                  icon={<CalculateIcon />} 
-                  iconPosition="start"
                 />
                 <Tab 
                   value="visualization" 
                   label="Визуализация" 
-                  icon={<AccountTreeIcon />} 
-                  iconPosition="start"
                 />
               </Tabs>
             </CardContent>
@@ -111,7 +104,6 @@ export default function Home() {
               <Button
                 variant="contained"
                 color="secondary"
-                startIcon={<CompareArrowsIcon />}
                 onClick={() => setShowFullComparison(!showFullComparison)}
                 fullWidth
               >
