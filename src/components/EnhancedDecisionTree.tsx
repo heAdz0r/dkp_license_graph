@@ -44,7 +44,7 @@ const EnhancedDecisionTree: React.FC<EnhancedDecisionTreeProps> = ({
   const [currentNodeId, setCurrentNodeId] = useState<string>("root");
   const [path, setPath] = useState<DecisionNode[]>([decisionTree.root]);
   const [isClient, setIsClient] = useState(false);
-  const [zoom, setZoom] = useState<d3.ZoomBehavior<Element, unknown> | null>(null);
+  const zoomRef = useRef<d3.ZoomBehavior<Element, unknown> | null>(null);
   
   // Состояние для отслеживания текущего масштаба и позиции
   const [transform, setTransform] = useState({ k: 1, x: 0, y: 0 });
@@ -156,9 +156,50 @@ const EnhancedDecisionTree: React.FC<EnhancedDecisionTreeProps> = ({
     setIsClient(true);
   }, []);
 
+  // Инициализируем zoom отдельно после монтирования на клиенте
+  useEffect(() => {
+    if (!isClient || !svgRef.current) return;
+
+    // Инициализация zoom behavior только после монтирования компонента
+    const zoomBehavior = d3
+      .zoom()
+      .scaleExtent([0.5, 2])
+      .on('zoom', (event) => {
+        if (gRef.current) {
+          d3.select(gRef.current).attr('transform', event.transform);
+          setTransform({
+            k: event.transform.k,
+            x: event.transform.x,
+            y: event.transform.y
+          });
+        }
+      });
+
+    // Сохраняем зум в реф для доступа из других функций
+    zoomRef.current = zoomBehavior;
+
+    const svg = d3.select(svgRef.current);
+    svg.call(zoomBehavior as any);
+    svg.on("dblclick.zoom", null);
+
+    // Задаем начальную трансформацию
+    svg.call(
+      zoomBehavior.transform as any,
+      d3.zoomIdentity.translate(width / 2, height / 2).scale(0.8)
+    );
+
+    // Очистка при размонтировании
+    return () => {
+      if (svgRef.current) {
+        d3.select(svgRef.current).on('.zoom', null);
+      }
+      zoomRef.current = null;
+    };
+  }, [isClient, width, height]);
+
   // Функция для фокусировки на конкретном узле
   const focusNode = useCallback((nodeData: TreeNodeData) => {
-    if (!svgRef.current || !zoom) return;
+    if (!svgRef.current || !zoomRef.current) return;
     
     // Получаем размеры SVG
     const svgWidth = svgRef.current.clientWidth || width;
@@ -173,11 +214,11 @@ const EnhancedDecisionTree: React.FC<EnhancedDecisionTreeProps> = ({
     d3.select(svgRef.current)
       .transition()
       .duration(ZOOM_DURATION)
-      .call(zoom.transform, d3.zoomIdentity.translate(x, y).scale(scale));
+      .call(zoomRef.current.transform as any, d3.zoomIdentity.translate(x, y).scale(scale));
       
     // Обновляем состояние трансформации
     setTransform({ k: scale, x, y });
-  }, [zoom, width, height]);
+  }, [width, height]);
 
   // Отрисовка дерева решений
   useEffect(() => {
@@ -215,29 +256,6 @@ const EnhancedDecisionTree: React.FC<EnhancedDecisionTreeProps> = ({
 
       const root = treeLayout(hierarchy as d3.HierarchyNode<DecisionNode>);
       if (!root) return;
-
-      // Настройка масштабирования (zoom)
-      const zoomBehavior = d3
-        .zoom<SVGSVGElement, unknown>()
-        .scaleExtent([0.5, 2]) // Минимальный и максимальный масштаб
-        .on('zoom', (event) => {
-          gElement.attr('transform', event.transform.toString());
-          setTransform({ 
-            k: event.transform.k, 
-            x: event.transform.x, 
-            y: event.transform.y 
-          });
-        });
-      
-      setZoom(zoomBehavior);
-      
-      svgElement.call(zoomBehavior)
-        .on("dblclick.zoom", null); // Отключаем двойной клик для зума
-      
-      // Начальная трансформация
-      svgElement.call(zoomBehavior.transform, d3.zoomIdentity
-        .translate(width / 2, height / 2)
-        .scale(0.8));
 
       // Добавляем маркер стрелки для связей
       svgElement
@@ -488,40 +506,40 @@ const EnhancedDecisionTree: React.FC<EnhancedDecisionTreeProps> = ({
     onEditionSelect(null);
     
     // Сбрасываем зум
-    if (svgRef.current && zoom) {
+    if (svgRef.current && zoomRef.current) {
       d3.select(svgRef.current)
         .transition()
         .duration(ZOOM_DURATION)
-        .call(zoom.transform, d3.zoomIdentity
+        .call(zoomRef.current.transform as any, d3.zoomIdentity
           .translate(width / 2, height / 2)
           .scale(0.8));
     }
   };
 
   const handleZoomIn = () => {
-    if (svgRef.current && zoom) {
+    if (svgRef.current && zoomRef.current) {
       d3.select(svgRef.current)
         .transition()
         .duration(200)
-        .call(zoom.scaleBy, 1.2);
+        .call(zoomRef.current.scaleBy as any, 1.2);
     }
   };
 
   const handleZoomOut = () => {
-    if (svgRef.current && zoom) {
+    if (svgRef.current && zoomRef.current) {
       d3.select(svgRef.current)
         .transition()
         .duration(200)
-        .call(zoom.scaleBy, 0.8);
+        .call(zoomRef.current.scaleBy as any, 0.8);
     }
   };
 
   const handleResetView = () => {
-    if (svgRef.current && zoom) {
+    if (svgRef.current && zoomRef.current) {
       d3.select(svgRef.current)
         .transition()
         .duration(ZOOM_DURATION)
-        .call(zoom.transform, d3.zoomIdentity
+        .call(zoomRef.current.transform as any, d3.zoomIdentity
           .translate(width / 2, height / 2)
           .scale(0.8));
     }
