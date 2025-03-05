@@ -83,15 +83,26 @@ export default function Home() {
           {viewMode === 'calculator' ? (
             <StepCalculator onEditionSelect={handleEditionSelect} />
           ) : (
-            <Card variant="outlined" sx={{ height: '100%' }}>
-              <CardContent>
-                <Typography variant="h6" gutterBottom>Граф принятия решений</Typography>
-                <Typography variant="body2" color="text.secondary" paragraph>
-                  Визуализация процесса выбора редакции на основе ваших требований.
-                </Typography>
+            <div>
+              {/* Используем div вместо Card для лучшей интеграции с D3 */}
+              <Typography variant="h6" gutterBottom>Граф принятия решений</Typography>
+              <Typography variant="body2" color="text.secondary" paragraph>
+                Визуализация процесса выбора редакции на основе ваших требований. Используйте колесо мыши для масштабирования и перетаскивание для перемещения графа.
+              </Typography>
+              <Paper
+                variant="outlined" 
+                sx={{ 
+                  p: 0, 
+                  overflow: 'hidden',
+                  '& > div': {
+                    width: '100%',
+                    height: '100%',
+                  }
+                }}
+              >
                 <DecisionTree onEditionSelect={handleEditionSelect} />
-              </CardContent>
-            </Card>
+              </Paper>
+            </div>
           )}
         </Grid>
         
