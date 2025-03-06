@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
-import { DecisionNode, decisionTree, Edition, editions } from '@/data/licenseData';
-import {
-  Box,
-  Button,
-  Card,
-  CardContent,
-  CardHeader,
-  Divider,
-  LinearProgress,
-  Stack,
-  Typography,
-  Alert
+import { 
+  Card, CardHeader, CardContent, CardActions,
+  Typography, Box, Button, LinearProgress,
+  Alert, Divider, Stepper, Step, StepLabel,
+  Stack
 } from '@mui/material';
+import {
+  Check as CheckIcon,
+  Close as CloseIcon,
+  Refresh as RefreshIcon,
+  ArrowBack as ArrowBackIcon
+} from '@mui/icons-material';
+import { DecisionNode, decisionTree, Edition, editions } from '@/data/licenseData';
 
 interface StepCalculatorProps {
   onEditionSelect: (edition: Edition | null) => void;
@@ -99,112 +99,106 @@ const StepCalculator: React.FC<StepCalculatorProps> = ({ onEditionSelect }) => {
   };
 
   return (
-    <Card variant="outlined">
+    <Card elevation={2}>
       <CardHeader
-        title={isEndNode ? "Рекомендуемая редакция" : "Калькулятор выбора редакции"}
+        title="Калькулятор редакции Deckhouse"
         subheader={isEndNode 
           ? "Мы подобрали подходящую редакцию для ваших требований" 
           : "Ответьте на вопросы для подбора оптимальной редакции"
         }
-        sx={{ 
-          bgcolor: 'primary.main', 
-          color: 'primary.contrastText',
-          '& .MuiCardHeader-subheader': { 
-            color: 'primary.contrastText', 
-            opacity: 0.8 
-          }
-        }}
+        sx={{ bgcolor: 'primary.main', color: 'white', pb: 1 }}
+        subheaderTypographyProps={{ color: 'primary.light' }}
       />
       
       {/* Индикатор прогресса */}
-      <Box sx={{ px: 2, pt: 2 }}>
+      <Box sx={{ px: 2, pt: 2, pb: 1 }}>
         <LinearProgress 
           variant="determinate" 
           value={getProgress()} 
-          sx={{ height: 8, borderRadius: 4 }}
+          sx={{ height: 8, borderRadius: 4 }} 
         />
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 0.5 }}>
+        <Box display="flex" justifyContent="space-between" mt={0.5}>
           <Typography variant="caption" color="text.secondary">Начало</Typography>
-          <Typography variant="caption" color="text.secondary">
-            Прогресс: {getProgress()}%
-          </Typography>
+          <Typography variant="caption" color="text.secondary">Прогресс: {getProgress()}%</Typography>
           <Typography variant="caption" color="text.secondary">Результат</Typography>
         </Box>
       </Box>
       
       <CardContent>
-        {/* Вопрос */}
-        <Box sx={{ mb: 3 }}>
-          <Typography variant="h6" gutterBottom>
-            {currentNode.question}
-          </Typography>
-          
-          {currentNode.featureId && (
-            <Alert severity="info" sx={{ mt: 1 }}>
-              Данный пункт влияет на выбор редакции и доступность ключевых функций платформы.
-            </Alert>
-          )}
-        </Box>
+        {/* Шаги процесса */}
+        <Stepper activeStep={history.length} alternativeLabel sx={{ mb: 3, display: { xs: 'none', sm: 'flex' } }}>
+          <Step key="start" completed={history.length > 0}>
+            <StepLabel>Начало</StepLabel>
+          </Step>
+          {history.map((nodeId, index) => (
+            <Step key={nodeId} completed={index < history.length - 1}>
+              <StepLabel>{decisionTree[nodeId].question.slice(0, 30)}...</StepLabel>
+            </Step>
+          ))}
+          <Step key="result" completed={isEndNode}>
+            <StepLabel>Результат</StepLabel>
+          </Step>
+        </Stepper>
         
-        {/* Кнопки ответов */}
-        {!isEndNode ? (
-          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-            {currentNode.yes && (
-              <Button
-                variant="contained"
-                color="success"
-                size="large"
-                fullWidth
-                onClick={() => handleAnswer(true)}
-              >
-                Да
-              </Button>
-            )}
-            
-            {currentNode.no && (
-              <Button
-                variant="contained"
-                color="error"
-                size="large"
-                fullWidth
-                onClick={() => handleAnswer(false)}
-              >
-                Нет
-              </Button>
-            )}
-          </Stack>
-        ) : (
-          <Button
-            variant="contained"
-            color="primary"
-            size="large"
-            fullWidth
-            onClick={handleReset}
-          >
-            Начать заново
-          </Button>
+        {/* Вопрос */}
+        <Typography variant="h6" gutterBottom>
+          {currentNode.question}
+        </Typography>
+        
+        {currentNode.featureId && (
+          <Alert severity="info" sx={{ mt: 2, mb: 3 }}>
+            Данный пункт влияет на выбор редакции и доступность ключевых функций платформы.
+          </Alert>
         )}
       </CardContent>
       
       <Divider />
       
-      {/* Навигация и история */}
-      <Box sx={{ px: 2, py: 1.5, bgcolor: 'background.default', display: 'flex', justifyContent: 'space-between' }}>
+      <CardActions sx={{ p: 2, justifyContent: 'space-between' }}>
         <Button
-          disabled={history.length === 0}
+          startIcon={<ArrowBackIcon />}
           onClick={handleBack}
+          disabled={history.length === 0}
+          variant="outlined"
           size="small"
         >
           Назад
         </Button>
         
-        <Button
-          onClick={handleReset}
-          size="small"
-        >
-          Начать заново
-        </Button>
-      </Box>
+        {!isEndNode ? (
+          <Stack direction="row" spacing={2}>
+            {currentNode.no && (
+              <Button
+                startIcon={<CloseIcon />}
+                onClick={() => handleAnswer(false)}
+                variant="contained"
+                color="error"
+              >
+                Нет
+              </Button>
+            )}
+            
+            {currentNode.yes && (
+              <Button
+                startIcon={<CheckIcon />}
+                onClick={() => handleAnswer(true)}
+                variant="contained"
+                color="success"
+              >
+                Да
+              </Button>
+            )}
+          </Stack>
+        ) : (
+          <Button
+            startIcon={<RefreshIcon />}
+            onClick={handleReset}
+            variant="contained"
+          >
+            Начать заново
+          </Button>
+        )}
+      </CardActions>
     </Card>
   );
 };

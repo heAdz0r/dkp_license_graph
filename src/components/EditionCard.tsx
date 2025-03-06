@@ -1,49 +1,46 @@
 import React, { useMemo } from 'react';
-import { Edition, Feature, FeatureStatus, features, CATEGORIES } from '@/data/licenseData';
-import {
-  Box,
-  Card,
-  CardActions,
-  CardContent,
-  CardHeader,
-  Chip,
-  CircularProgress,
-  Divider,
-  Link,
-  List,
-  ListItem,
-  ListItemText,
-  Typography,
-  useTheme
+import { 
+  Card, CardHeader, CardContent, CardActions, 
+  Typography, Box, Button, List, ListItem, ListItemIcon, ListItemText,
+  Divider, LinearProgress, Chip, Avatar
 } from '@mui/material';
+import {
+  Check as CheckIcon,
+  Close as CloseIcon,
+  Schedule as ScheduleIcon,
+  Info as InfoIcon,
+  Launch as LaunchIcon
+} from '@mui/icons-material';
+import { Edition, Feature, FeatureStatus, features, CATEGORIES } from '@/data/licenseData';
 
 interface EditionCardProps {
   edition: Edition;
   features: Feature[];
 }
 
-// Компонент для более наглядного отображения статуса функции
 const EditionCard: React.FC<EditionCardProps> = ({ edition, features }) => {
-  const theme = useTheme();
-  
-  const statusConfig = useMemo<Record<FeatureStatus, { color: string; label: string }>>(() => ({
+  const statusConfig = useMemo(() => ({
     'present': {
-      color: theme.palette.success.main,
-      label: 'Доступно'
+      label: 'Доступно',
+      color: 'success',
+      icon: <CheckIcon color="success" />
     },
     'absent': {
-      color: theme.palette.error.main,
-      label: 'Недоступно'
+      label: 'Недоступно',
+      color: 'error',
+      icon: <CloseIcon color="error" />
     },
     'planned': {
-      color: theme.palette.warning.main,
-      label: 'Планируется'
+      label: 'Планируется',
+      color: 'warning',
+      icon: <ScheduleIcon color="warning" />
     },
     'conditionally-available': {
-      color: theme.palette.info.main,
-      label: 'Условно'
+      label: 'Условно',
+      color: 'info',
+      icon: <InfoIcon color="info" />
     }
-  }), [theme]);
+  }), []);
 
   // Фильтруем и группируем функции по категориям для лучшей организации
   const groupedFeatures = useMemo(() => {
@@ -80,138 +77,128 @@ const EditionCard: React.FC<EditionCardProps> = ({ edition, features }) => {
     };
   }, [edition.features, features.length]);
 
-  const showSpecialBadge = (id: string) => {
-    if (id.includes('cert')) {
-      return <Chip size="small" color="primary" label="ФСТЭК" sx={{ mr: 1 }} />;
+  // Функция для получения цвета статуса
+  const getStatusColor = (status: FeatureStatus) => {
+    switch (status) {
+      case 'present': return 'success';
+      case 'absent': return 'error';
+      case 'planned': return 'warning';
+      case 'conditionally-available': return 'info';
+      default: return 'default';
     }
-    if (id === 'community') {
-      return <Chip size="small" color="success" label="Open Source" sx={{ mr: 1 }} />;
-    }
-    return null;
   };
 
   return (
-    <Card variant="outlined">
+    <Card elevation={2}>
       <CardHeader
-        title={
-          <Box display="flex" alignItems="center">
-            {showSpecialBadge(edition.id)}
-            <Typography variant="h6">{edition.name}</Typography>
-          </Box>
-        }
+        title={edition.name}
         subheader={edition.description}
-        titleTypographyProps={{ component: 'div' }}
         action={
-          <Box position="relative" display="inline-flex">
-            <CircularProgress 
-              variant="determinate" 
-              value={featureStats.percentage} 
-              size={40} 
-            />
-            <Box
-              sx={{
-                top: 0,
-                left: 0,
-                bottom: 0,
-                right: 0,
-                position: 'absolute',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <Typography variant="caption" color="text.secondary">
-                {featureStats.percentage}%
-              </Typography>
-            </Box>
-          </Box>
+          <Chip 
+            label={`ID: ${edition.id}`} 
+            size="small" 
+            variant="outlined" 
+          />
         }
         sx={{ 
-          bgcolor: theme.palette.primary.main, 
-          color: theme.palette.primary.contrastText,
-          '& .MuiCardHeader-subheader': { 
-            color: theme.palette.primary.contrastText, 
-            opacity: 0.8 
+          bgcolor: 'primary.main', 
+          color: 'white',
+          '& .MuiCardHeader-subheader': { color: 'primary.light' },
+          '& .MuiCardHeader-action .MuiChip-outlined': { 
+            color: 'white', 
+            borderColor: 'primary.light' 
           }
         }}
       />
       
-      <CardContent sx={{ p: 0, maxHeight: 400, overflow: 'auto' }}>
-        {Object.entries(groupedFeatures).map(([category, categoryFeatures]) => (
-          <Box key={category} sx={{ mb: 1 }}>
-            <Box 
-              sx={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                px: 2, 
-                py: 1,
-                bgcolor: 'action.hover'
-              }}
-            >
-              <Typography variant="subtitle2">{category}</Typography>
-            </Box>
+      <Box sx={{ px: 2, pt: 2, pb: 1 }}>
+        <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
+          <Typography variant="body2" color="text.secondary">
+            Доступность функций
+          </Typography>
+          <Typography variant="body2" fontWeight="medium">
+            {featureStats.available} из {featureStats.total}
+          </Typography>
+        </Box>
+        <LinearProgress 
+          variant="determinate" 
+          value={featureStats.percentage} 
+          sx={{ height: 8, borderRadius: 4 }} 
+        />
+        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', textAlign: 'right', mt: 0.5 }}>
+          {featureStats.percentage}%
+        </Typography>
+      </Box>
+      
+      <CardContent sx={{ pt: 1 }}>
+        {Object.entries(groupedFeatures).map(([category, categoryFeatures], index) => (
+          <React.Fragment key={category}>
+            {index > 0 && <Divider sx={{ my: 2 }} />}
             
-            <List dense disablePadding>
+            <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+              {category}
+            </Typography>
+            
+            <List disablePadding>
               {categoryFeatures.map(feature => {
                 const status = edition.features[feature.id] || 'absent';
-                const { label } = statusConfig[status];
+                const { icon, label } = statusConfig[status];
+                const statusColor = getStatusColor(status);
                 
                 return (
                   <ListItem 
                     key={feature.id} 
-                    divider
-                    secondaryAction={
-                      <Chip 
-                        label={label} 
-                        size="small" 
-                        color={
-                          status === 'present' ? 'success' : 
-                          status === 'planned' ? 'warning' : 
-                          status === 'conditionally-available' ? 'info' : 'error'
-                        }
-                        variant="outlined"
-                      />
-                    }
+                    disablePadding 
+                    sx={{ py: 0.75 }}
                   >
-                    <ListItemText 
-                      primary={feature.name}
-                      secondary={feature.importance >= 8 ? 'Важно' : null}
-                      primaryTypographyProps={{ variant: 'body2' }}
-                      secondaryTypographyProps={{ 
-                        variant: 'caption',
-                        color: 'error'
-                      }}
+                    <ListItemIcon sx={{ minWidth: 36 }}>
+                      {icon}
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={
+                        <Box display="flex" justifyContent="space-between" alignItems="center">
+                          <Typography variant="body2" fontWeight={feature.importance >= 8 ? 'medium' : 'regular'}>
+                            {feature.name}
+                          </Typography>
+                          <Chip 
+                            label={label} 
+                            size="small" 
+                            color={statusColor as any}
+                            variant="outlined"
+                            sx={{ 
+                              height: 20, 
+                              '& .MuiChip-label': { px: 1, fontSize: '0.625rem' } 
+                            }} 
+                          />
+                        </Box>
+                      }
+                      secondary={
+                        <Typography variant="caption" color="text.secondary">
+                          {feature.description}
+                        </Typography>
+                      }
+                      secondaryTypographyProps={{ component: 'div' }}
                     />
                   </ListItem>
                 );
               })}
             </List>
-          </Box>
+          </React.Fragment>
         ))}
       </CardContent>
       
       <Divider />
       
-      <CardActions sx={{ p: 2, justifyContent: 'center' }}>
-        <Link
-          href="https://deckhouse.ru/products/kubernetes-platform/pricing/"
+      <CardActions>
+        <Button 
+          href="https://deckhouse.ru/products/kubernetes-platform/pricing/" 
           target="_blank"
           rel="noopener noreferrer"
-          underline="none"
-          sx={{
-            bgcolor: theme.palette.primary.main,
-            color: theme.palette.primary.contrastText,
-            py: 1,
-            px: 3,
-            borderRadius: 1,
-            display: 'inline-block',
-            '&:hover': {
-              bgcolor: theme.palette.primary.dark,
-            }
-          }}
+          endIcon={<LaunchIcon />}
+          fullWidth
         >
           Подробнее о лицензировании
-        </Link>
+        </Button>
       </CardActions>
     </Card>
   );

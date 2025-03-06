@@ -1,26 +1,21 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
+import { 
+  Typography, Box, Card, CardContent, CardHeader,
+  Grid, Checkbox, FormControlLabel, Button, Chip,
+  Paper, Divider, Link as MuiLink, Alert, Stack
+} from '@mui/material';
+import {
+  ArrowBack as ArrowBackIcon,
+  CheckCircle as CheckCircleIcon,
+  Report as ReportIcon,
+  Verified as VerifiedIcon,
+  Public as PublicIcon
+} from '@mui/icons-material';
 import Link from 'next/link';
 import ComparisonTable from '@/components/ComparisonTable';
 import { editions } from '@/data/licenseData';
-import {
-  Box,
-  Button,
-  Card,
-  CardContent,
-  CardHeader,
-  Checkbox,
-  Chip,
-  Divider,
-  FormControlLabel,
-  FormGroup,
-  Grid,
-  Paper,
-  Stack,
-  Typography,
-  Alert
-} from '@mui/material';
 
 export default function ComparePage() {
   // Состояние для выбранных редакций
@@ -68,109 +63,138 @@ export default function ComparePage() {
   }, []);
 
   return (
-    <Box>
-      <Card variant="outlined" sx={{ mb: 3 }}>
-        <CardHeader
+    <Box sx={{ py: 3 }}>
+      {/* Секция выбора редакций для сравнения */}
+      <Card sx={{ mb: 4 }}>
+        <CardHeader 
           title="Сравнение редакций Deckhouse Kubernetes Platform"
-          subheader="Выберите редакции для детального сравнения функциональных возможностей"
+          subheader="Выберите редакции, которые хотите сравнить, и исследуйте их функциональные возможности"
+          sx={{ bgcolor: 'primary.main', color: 'white' }}
+          subheaderTypographyProps={{ color: 'primary.light' }}
         />
         
         <CardContent>
-          {/* Контроль выбора */}
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+          {/* Управление выбором */}
+          <Box 
+            display="flex" 
+            flexWrap="wrap" 
+            justifyContent="space-between" 
+            alignItems="center" 
+            mb={3}
+          >
             <Typography variant="body2" color="text.secondary">
               Выбрано {selectedEditions.length} из {editions.length} редакций
             </Typography>
             
-            <Stack direction="row" spacing={1}>
+            <Stack direction="row" spacing={2}>
               <Button 
-                size="small"
                 onClick={handleSelectAll}
                 variant="outlined"
+                size="small"
               >
                 Выбрать все
               </Button>
+              
               <Button 
-                size="small"
                 onClick={handleClearAll}
                 variant="outlined"
+                size="small"
+                color="inherit"
                 disabled={selectedEditions.length === 0}
               >
-                Очистить
+                Очистить выбор
               </Button>
             </Stack>
           </Box>
           
-          {/* Группировка по типам редакций */}
-          <Box sx={{ mb: 3 }}>
-            <Typography variant="subtitle1" gutterBottom>
-              Сертифицированные редакции
-            </Typography>
-            <Grid container spacing={1}>
-              {editionGroups.certified.map(edition => (
-                <Grid item xs={12} sm={6} md={4} key={edition.id}>
-                  <EditionCheckbox 
-                    edition={edition}
-                    isChecked={selectedEditions.includes(edition.id)}
-                    onChange={() => handleEditionToggle(edition.id)}
-                    highlight={true}
-                  />
-                </Grid>
-              ))}
-            </Grid>
-          </Box>
-          
-          <Box sx={{ mb: 3 }}>
-            <Typography variant="subtitle1" gutterBottom>
-              Коммерческие редакции
-            </Typography>
-            <Grid container spacing={1}>
-              {editionGroups.commercial.map(edition => (
-                <Grid item xs={12} sm={6} md={4} key={edition.id}>
-                  <EditionCheckbox 
-                    edition={edition}
-                    isChecked={selectedEditions.includes(edition.id)}
-                    onChange={() => handleEditionToggle(edition.id)}
-                  />
-                </Grid>
-              ))}
-            </Grid>
-          </Box>
-          
-          <Box sx={{ mb: 3 }}>
-            <Typography variant="subtitle1" gutterBottom>
-              Открытые редакции
-            </Typography>
-            <Grid container spacing={1}>
-              {editionGroups.community.map(edition => (
-                <Grid item xs={12} sm={6} md={4} key={edition.id}>
-                  <EditionCheckbox 
-                    edition={edition}
-                    isChecked={selectedEditions.includes(edition.id)}
-                    onChange={() => handleEditionToggle(edition.id)}
-                  />
-                </Grid>
-              ))}
-            </Grid>
-          </Box>
+          {/* Группы редакций для выбора */}
+          <Stack spacing={3}>
+            {/* Сертифицированные редакции */}
+            <Box>
+              <Typography variant="h6" gutterBottom>
+                Сертифицированные редакции
+              </Typography>
+              <Grid container spacing={2}>
+                {editionGroups.certified.map(edition => (
+                  <Grid item xs={12} sm={6} md={4} key={edition.id}>
+                    <EditionCheckbox 
+                      edition={edition}
+                      isChecked={selectedEditions.includes(edition.id)}
+                      onChange={() => handleEditionToggle(edition.id)}
+                      highlight={true}
+                      icon={<VerifiedIcon color="info" />}
+                    />
+                  </Grid>
+                ))}
+              </Grid>
+            </Box>
+            
+            {/* Коммерческие редакции */}
+            <Box>
+              <Typography variant="h6" gutterBottom>
+                Коммерческие редакции
+              </Typography>
+              <Grid container spacing={2}>
+                {editionGroups.commercial.map(edition => (
+                  <Grid item xs={12} sm={6} md={4} key={edition.id}>
+                    <EditionCheckbox 
+                      edition={edition}
+                      isChecked={selectedEditions.includes(edition.id)}
+                      onChange={() => handleEditionToggle(edition.id)}
+                    />
+                  </Grid>
+                ))}
+              </Grid>
+            </Box>
+            
+            {/* Открытые редакции */}
+            <Box>
+              <Typography variant="h6" gutterBottom>
+                Открытые редакции
+              </Typography>
+              <Grid container spacing={2}>
+                {editionGroups.community.map(edition => (
+                  <Grid item xs={12} sm={6} md={4} key={edition.id}>
+                    <EditionCheckbox 
+                      edition={edition}
+                      isChecked={selectedEditions.includes(edition.id)}
+                      onChange={() => handleEditionToggle(edition.id)}
+                      icon={<PublicIcon color="success" />}
+                    />
+                  </Grid>
+                ))}
+              </Grid>
+            </Box>
+          </Stack>
           
           <Divider sx={{ my: 3 }} />
           
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Button
+          {/* Кнопка возврата */}
+          <Box display="flex" justifyContent="space-between" alignItems="center">
+            <Button 
               component={Link}
               href="/"
+              startIcon={<ArrowBackIcon />}
               variant="contained"
             >
-              Вернуться к выбору
+              Вернуться к выбору редакции
             </Button>
             
+            {/* Количество выбранных редакций */}
             {selectedEditions.length === 0 ? (
-              <Alert severity="warning" sx={{ flexGrow: 1, ml: 2 }}>
+              <Alert 
+                severity="warning"
+                icon={<ReportIcon />}
+                sx={{ py: 0 }}
+              >
                 Выберите хотя бы одну редакцию для сравнения
               </Alert>
             ) : (
-              <Alert severity="success" sx={{ flexGrow: 1, ml: 2 }}>
+              <Alert 
+                severity="success" 
+                icon={<CheckCircleIcon />}
+                sx={{ py: 0 }}
+              >
                 Выбрано {selectedEditions.length} редакций для сравнения
               </Alert>
             )}
@@ -178,19 +202,30 @@ export default function ComparePage() {
         </CardContent>
       </Card>
       
+      {/* Секция таблицы сравнения */}
       {selectedEditions.length > 0 ? (
         <ComparisonTable selectedEditions={editionsToShow} />
       ) : (
-        <Paper sx={{ p: 6, textAlign: 'center' }}>
-          <Typography variant="h6" gutterBottom>
+        <Paper 
+          sx={{ 
+            p: 4, 
+            textAlign: 'center',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: 2
+          }}
+        >
+          <ReportIcon sx={{ fontSize: 48, color: 'text.disabled' }} />
+          <Typography variant="h6" color="text.primary">
             Не выбрано ни одной редакции
           </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 3, maxWidth: 500, mx: 'auto' }}>
+          <Typography color="text.secondary" sx={{ maxWidth: 500, mx: 'auto', mb: 2 }}>
             Выберите хотя бы одну редакцию выше, чтобы увидеть таблицу сравнения функциональных возможностей
           </Typography>
           <Button 
-            variant="contained" 
             onClick={handleSelectAll}
+            variant="contained"
           >
             Выбрать все редакции
           </Button>
@@ -200,85 +235,95 @@ export default function ComparePage() {
   );
 }
 
-// Компонент для выбора редакции
+// Компонент для выбора редакции с Material UI
 interface EditionCheckboxProps {
   edition: { id: string; name: string; description: string };
   isChecked: boolean;
   onChange: () => void;
   highlight?: boolean;
+  icon?: React.ReactNode;
 }
 
 const EditionCheckbox: React.FC<EditionCheckboxProps> = ({ 
   edition, 
   isChecked, 
   onChange,
-  highlight = false
+  highlight = false,
+  icon = null
 }) => {
   return (
-    <Paper
+    <Paper 
       variant="outlined"
       sx={{ 
-        p: 1.5, 
+        p: 2, 
         border: isChecked ? 2 : 1,
         borderColor: isChecked ? 'primary.main' : 'divider',
         bgcolor: isChecked ? 'primary.50' : 'background.paper',
         position: 'relative',
-        overflow: 'hidden'
+        overflow: 'hidden',
+        transition: 'all 0.2s'
       }}
     >
-      <FormGroup>
-        <FormControlLabel
-          control={
-            <Checkbox 
-              checked={isChecked}
-              onChange={onChange}
-              color="primary"
-            />
-          }
-          label={
-            <Box>
-              <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
-                {edition.name}
-              </Typography>
-              <Typography variant="caption" color="text.secondary" component="div">
-                {edition.description.length > 60 
-                  ? `${edition.description.substring(0, 60)}...` 
-                  : edition.description}
-              </Typography>
-              
-              {edition.id.includes('cert') && (
-                <Chip 
-                  label="ФСТЭК" 
-                  size="small" 
-                  color="primary" 
-                  sx={{ mt: 0.5 }} 
-                />
-              )}
-              {edition.id === 'community' && (
-                <Chip 
-                  label="Open Source" 
-                  size="small" 
-                  color="success" 
-                  sx={{ mt: 0.5 }} 
-                />
-              )}
+      <FormControlLabel
+        control={
+          <Checkbox 
+            checked={isChecked} 
+            onChange={onChange}
+            color="primary"
+          />
+        }
+        label={
+          <Box>
+            <Box display="flex" alignItems="center" gap={1}>
+              <Typography variant="subtitle2">{edition.name}</Typography>
+              {icon}
             </Box>
-          }
-        />
-      </FormGroup>
+            <Typography variant="caption" color="text.secondary" display="block">
+              {edition.description}
+            </Typography>
+            
+            {/* Бейдж для специальных редакций */}
+            {edition.id.includes('cert') && (
+              <Chip 
+                label="Сертифицировано ФСТЭК" 
+                size="small" 
+                color="info"
+                variant="outlined"
+                sx={{ mt: 1, height: 20 }}
+              />
+            )}
+            {edition.id === 'community' && (
+              <Chip 
+                label="Открытый исходный код" 
+                size="small" 
+                color="success"
+                variant="outlined"
+                sx={{ mt: 1, height: 20 }}
+              />
+            )}
+          </Box>
+        }
+        sx={{ 
+          alignItems: 'flex-start',
+          marginLeft: 0,
+          marginRight: 0,
+          width: '100%'
+        }}
+      />
       
+      {/* Лейбл для выбранных редакций */}
       {isChecked && (
         <Chip 
           label="Выбрано" 
-          size="small" 
+          size="small"
           color="primary"
           sx={{ 
-            position: 'absolute', 
-            top: 0, 
-            right: 0,
-            borderRadius: '0 0 0 8px',
-            fontWeight: 'bold'
-          }} 
+            position: 'absolute',
+            top: 4,
+            right: 4,
+            height: 20,
+            '& .MuiChip-label': { px: 1 }
+          }}
         />
       )}
     </Paper>
