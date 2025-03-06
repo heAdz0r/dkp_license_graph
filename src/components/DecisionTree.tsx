@@ -11,35 +11,45 @@ interface DecisionTreeProps {
 
 const DecisionTree: React.FC<DecisionTreeProps> = ({ onEditionSelect }) => {
   return (
-    <Suspense 
+    <Suspense
       fallback={
-        <Box 
+        <Box
           sx={{
-            p: 6, 
-            bgcolor: 'background.paper',
+            p: 6,
+            bgcolor: "background.paper",
             borderRadius: 1,
-            border: '1px solid',
-            borderColor: 'divider',
-            height: '550px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
+            border: "1px solid",
+            borderColor: "divider",
+            height: "550px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
           }}
         >
-          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+          >
             <CircularProgress size={48} sx={{ mb: 2 }} color="primary" />
-            <Box sx={{ 
-              typography: 'body1', 
-              fontWeight: 'medium',
-              color: 'text.primary',
-              mb: 1
-            }}>
+            <Box
+              sx={{
+                typography: "body1",
+                fontWeight: "medium",
+                color: "text.primary",
+                mb: 1,
+              }}
+            >
               Загрузка визуализации графа решений...
             </Box>
-            <Box sx={{ 
-              typography: 'caption',
-              color: 'text.secondary'
-            }}>
+            <Box
+              sx={{
+                typography: "caption",
+                color: "text.secondary",
+              }}
+            >
               Подготовка интерактивной диаграммы выбора редакции DKP
             </Box>
           </Box>
